@@ -1,0 +1,994 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"HARP",
+				"HARPOON_COLLISION_TYPE"
+			],
+			[
+				"sPIKE",
+				"SpikeCollisionBegin"
+			],
+			[
+				"Iske",
+				"IsKeyPressed"
+			],
+			[
+				"CP_BO",
+				"CP_BODY_TYPE_STATIC"
+			],
+			[
+				"CP_BOD",
+				"CP_BODY_TYPE_KINEMATIC"
+			],
+			[
+				"create",
+				"CreateHarpoon"
+			],
+			[
+				"hARP",
+				"Harpoon"
+			],
+			[
+				"Ismouse",
+				"IsMouseButtonPressed"
+			],
+			[
+				"ismouse",
+				"IsMouseButtonDown"
+			],
+			[
+				"isKe",
+				"IsKeyPressed"
+			],
+			[
+				"mPOp",
+				"mPopulationSize"
+			],
+			[
+				"readl",
+				"readFile"
+			],
+			[
+				"rea",
+				"readFile"
+			],
+			[
+				"PLAYER_C",
+				"PLAYER_BODY_COLLISION_TYPE"
+			],
+			[
+				"PLAYER",
+				"PLAYER_BODY_COLLISION_TYPE"
+			],
+			[
+				"player",
+				"PLAYER_ISGROUNDED_COLLISION_TYPE"
+			],
+			[
+				"cpShapeSetF",
+				"cpShapeSetFriction"
+			],
+			[
+				"swap",
+				"swapMutation"
+			],
+			[
+				"mnUM",
+				"mNumberOfGenes"
+			],
+			[
+				"rep",
+				"repairSolution"
+			],
+			[
+				"prin",
+				"printSolution"
+			],
+			[
+				"repair",
+				"repairSolution2"
+			],
+			[
+				"mem",
+				"memcmp"
+			],
+			[
+				"unor",
+				"unordered_set>"
+			],
+			[
+				"repa",
+				"repairSolution2"
+			],
+			[
+				"inv",
+				"invVector"
+			],
+			[
+				"gen",
+				"genSolution"
+			],
+			[
+				"posi",
+				"possibleConnections"
+			],
+			[
+				"num",
+				"numbersOnes"
+			],
+			[
+				"cpBox",
+				"cpBoxShapeInit"
+			],
+			[
+				"is",
+				"isGroundedShape"
+			],
+			[
+				"DrawR",
+				"DrawRectangleLines"
+			],
+			[
+				"cpShapeb",
+				"cpShapeGetBB"
+			],
+			[
+				"cpShapeGet",
+				"cpShapeGetBB"
+			],
+			[
+				"isgr",
+				"isGroundedShape"
+			],
+			[
+				"cpMO",
+				"cpMomentForBox"
+			],
+			[
+				"Iskey",
+				"IsKeyPressed"
+			],
+			[
+				"cpbo",
+				"cpBodyType"
+			],
+			[
+				"Coll",
+				"ColliderSetPosition"
+			],
+			[
+				"Colider",
+				"ColliderGetPosition"
+			],
+			[
+				"vEC",
+				"Vector2"
+			],
+			[
+				"Camera",
+				"Camera2D"
+			],
+			[
+				"DrawRecta",
+				"DrawRectanglePro"
+			],
+			[
+				"DrawRectang",
+				"DrawRectanglePro"
+			],
+			[
+				"ISkey",
+				"IsKeyPressed"
+			],
+			[
+				"CP_bOD",
+				"CP_BODY_TYPE_KINEMATIC"
+			],
+			[
+				"body",
+				"bodyshape"
+			],
+			[
+				"CP_B",
+				"CP_BODY_TYPE_KINEMATIC"
+			],
+			[
+				"lin",
+				"LINKER_FLAGS_RAYLIB\tLINKER_FLAGS_RAYLIB"
+			],
+			[
+				"tp",
+				"tpEntUpdate"
+			],
+			[
+				"tpe",
+				"tpEntRender"
+			],
+			[
+				"typ",
+				"typefunction\ttypedefFunction"
+			],
+			[
+				"type",
+				"typefunction\ttypedefFunction"
+			],
+			[
+				"make",
+				"makeExeCpp\tMakeExeCpp"
+			],
+			[
+				"fi",
+				"mFitness"
+			],
+			[
+				"mNUm",
+				"mNumberOfGenes"
+			],
+			[
+				"g",
+				"mGenes"
+			],
+			[
+				"mpopu",
+				"mPopulationSize"
+			],
+			[
+				"print",
+				"printSolution"
+			],
+			[
+				"command",
+				"commandmanager_execute_command"
+			],
+			[
+				"best",
+				"bestCost"
+			],
+			[
+				"random",
+				"Random"
+			],
+			[
+				"new",
+				"newSolution"
+			],
+			[
+				"m",
+				"mAdjacencyMatrix"
+			],
+			[
+				"vert",
+				"vertice2"
+			],
+			[
+				"adjan",
+				"mAdjacencyMatrix"
+			],
+			[
+				"read",
+				"readfile\tRead File Into Vector"
+			],
+			[
+				"hbi",
+				"hybrid"
+			],
+			[
+				"hybi",
+				"Hybrid"
+			],
+			[
+				"sear",
+				"search_algorithm.hpp\""
+			],
+			[
+				"hil",
+				"hill_climbing.hpp\""
+			],
+			[
+				"evol",
+				"Evolutionary"
+			],
+			[
+				"sera",
+				"search_algorithm.hpp\""
+			],
+			[
+				"clas",
+				"class\tclass-..-(class)"
+			],
+			[
+				"cla",
+				"class\tclass-..-(class)"
+			],
+			[
+				"SO",
+				"SOCKET_ERROR"
+			],
+			[
+				"Rec",
+				"ReconnectServer"
+			],
+			[
+				"BOILER",
+				"boilerplate_window_win32\tboilerplate_window_win32"
+			],
+			[
+				"filen",
+				"filename"
+			],
+			[
+				"filenam",
+				"filename"
+			],
+			[
+				"contr",
+				"controlPressed"
+			],
+			[
+				"largu",
+				"largura_zona"
+			],
+			[
+				"get",
+				"getInterface"
+			],
+			[
+				"lar",
+				"largura_percentual_habitacao"
+			],
+			[
+				"altu",
+				"altura_log_comandos"
+			],
+			[
+				"percen",
+				"largura_percentual_habitacao"
+			],
+			[
+				"altura",
+				"altura_zona"
+			],
+			[
+				"comma",
+				"COMMAND_CLASS"
+			],
+			[
+				"Com",
+				"Commando"
+			],
+			[
+				"arg",
+				"argTypes"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "raylib_game.rc",
+			"settings":
+			{
+				"buffer_size": 746,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/C++/C Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C Single File.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				]
+			],
+			[
+				"Packages/Makefile/Make.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/User/MySnippets/C++ Single WinSockets.sublime-build",
+					""
+				],
+				[
+					"Packages/User/MySnippets/C++ Single WinSockets.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/User/MySnippets/C++ Single WinSockets.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"term",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"termin",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"fiel",
+				"File: Close All"
+			],
+			[
+				"ter",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"termi",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"file",
+				"File: Close All"
+			],
+			[
+				"TERM",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"sy",
+				"Set Syntax: C++"
+			],
+			[
+				"filec",
+				"File: Close All"
+			],
+			[
+				"s",
+				"Set Syntax: C++"
+			],
+			[
+				"lSP set",
+				"Preferences: LSP Settings"
+			],
+			[
+				"c+",
+				"Set Syntax: C++"
+			],
+			[
+				"C++",
+				"Set Syntax: Objective-C++"
+			],
+			[
+				"syn",
+				"Set Syntax: C++11"
+			],
+			[
+				"LSP",
+				"Preferences: LSP Settings"
+			],
+			[
+				"LSP enab",
+				"LSP: Enable Language Server Globally"
+			],
+			[
+				"sing",
+				"Build With: C Single File - Run"
+			],
+			[
+				"single",
+				"Build With: C Single File - Run"
+			],
+			[
+				"renma",
+				"Rename File"
+			],
+			[
+				"t",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"isntal",
+				"Selection: Select All"
+			],
+			[
+				"REMOVEP",
+				"Package Control: Remove Package"
+			],
+			[
+				"SYNTAX c++",
+				"Set Syntax: C++"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"syntax C",
+				"Set Syntax: C++11"
+			],
+			[
+				"syntax C++",
+				"Set Syntax: C++11"
+			],
+			[
+				"syntax C impr",
+				"Set Syntax: C Improved"
+			],
+			[
+				"syntax C+",
+				"Set Syntax: C++11"
+			],
+			[
+				"syntax",
+				"Set Syntax: C++"
+			],
+			[
+				"LS",
+				"Preferences: LSP Settings"
+			],
+			[
+				"close",
+				"File: Close All"
+			],
+			[
+				"LSP sett",
+				"Preferences: LSP Settings"
+			],
+			[
+				"set syntax c++",
+				"Set Syntax: C++"
+			],
+			[
+				"terminu",
+				"Terminus: Toggle Panel"
+			],
+			[
+				"SIDEB",
+				"View: Toggle Open Files in Side Bar"
+			],
+			[
+				"color",
+				"UI: Select Color Scheme"
+			],
+			[
+				"theme",
+				"UI: Select Theme"
+			],
+			[
+				"LSP settings",
+				"Preferences: LSP Settings"
+			],
+			[
+				"lsp setin",
+				"Preferences: LSP-clangd Settings"
+			],
+			[
+				"enable",
+				"LSP: Enable Language Server Globally"
+			],
+			[
+				"removep",
+				"Package Control: Remove Package"
+			],
+			[
+				"lsp ena",
+				"LSP: Enable Language Server Globally"
+			],
+			[
+				"lsp",
+				"LSP: Restart Server"
+			],
+			[
+				"LSP enabl",
+				"LSP: Enable Language Server Globally"
+			],
+			[
+				"sideb",
+				"View: Toggle Open Files in Side Bar"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Rodrigo Reis/Documents/game-jam2023/src"
+	],
+	"file_history":
+	[
+		"/C/raylib/src/Makefile",
+		"/C/Users/Rodrigo Reis/Downloads/raylib-gamejam-template-main/src/compile_flags.txt",
+		"/C/Users/Rodrigo Reis/Downloads/raylib-gamejam-template-main/src/raylib_game.c",
+		"/C/Users/Rodrigo Reis/Downloads/raylib-gamejam-template-main/src/Makefile",
+		"/C/Users/Rodrigo Reis/Desktop/raylib-gamejam-template-main/src/raylib_game.rc",
+		"/C/Users/Rodrigo Reis/Desktop/raylib-gamejam-template-main/src/Makefile",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/parson.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/src/main.c",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/MakeFile",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/raygui.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/cpSpace.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/src/Game.c",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/hill_climbing.hpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/main.cpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/search_algorithm.hpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/hybrid.cpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/evolutionary_algorithm.cpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/hill_climbing.cpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/hybrid_algorithm.hpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/evolutionary_algorithm.hpp",
+		"/C/Users/Rodrigo Reis/AppData/Local/Sublime Text/Package Storage/LSP-clangd/clangd_17.0.3/lib/clang/17/include/stdbool.h",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/benchmark.hpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/MakeFile",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/search_algorithm.cpp",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/cpBB.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/src/Game.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/cpBody.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/chipmunk_types.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/chipmunk.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/include/chipmunk/chipmunk_structs.h",
+		"/C/Users/Rodrigo Reis/Documents/Jogo/src/compile_flags.txt",
+		"/C/Users/Rodrigo Reis/AppData/Roaming/Sublime Text/Packages/User/MySnippets/MakeFiles/MakeExeCpp.sublime-snippet",
+		"/D/TRABALHO_AAI/src/search_algorithm.cpp",
+		"/D/TRABALHO_AAI/include/search_algorithm.hpp",
+		"/D/TRABALHO_AAI/include/evolutionary_algorithm.hpp",
+		"/D/TRABALHO_AAI/src/hill_climbing.cpp",
+		"/D/TRABALHO_AAI/MakeFile",
+		"/D/TRABALHO_AAI/src/evolutionary_algorithm.cpp",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/funcao.h",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/algoritmo.c",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/funcao.c",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/algoritmo.h",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/utils.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/victim/victim.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/admin/main.c",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/utils.h",
+		"/C/Users/Rodrigo Reis/Desktop/main3.c",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/t.c",
+		"/C/Users/Rodrigo Reis/Downloads/Ficha 7 IIA/src/main.c",
+		"/C/Users/Rodrigo Reis/Desktop/CodigoTrepaColinas/algoritmo.h",
+		"/C/Users/Rodrigo Reis/Desktop/CodigoTrepaColinas/funcao.c",
+		"/C/Users/Rodrigo Reis/Desktop/CodigoTrepaColinas/algoritmo.c",
+		"/C/Users/Rodrigo Reis/Desktop/CodigoTrepaColinas/main.c",
+		"/C/mingw64/include/c++/13.2.0/bits/stl_vector.h",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/include/random.hpp",
+		"/C/Users/Rodrigo Reis/Documents/IAA-TP-2023-2024/TP2/src/compile_flags.txt",
+		"/C/Users/Rodrigo Reis/Desktop/autoclick/main.c",
+		"/C/Users/Rodrigo Reis/Downloads/tcp-server (1).c",
+		"/C/Users/Rodrigo Reis/Documents/Teste/tcp-server_select.c",
+		"/C/Users/Rodrigo Reis/Documents/Teste/tcp-client.c",
+		"/C/Users/Rodrigo Reis/Documents/Teste/tcp-client_threads.c",
+		"/C/Users/Rodrigo Reis/Documents/isec/IRC-P1_PL-main/TCP/Exercicio05 (incompleto)/Servidor.c",
+		"/C/Users/Rodrigo Reis/Documents/Nova pasta/servidorTCPv1.c",
+		"/C/Users/Rodrigo Reis/Documents/main.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/Makefile",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/bin/release/Nuno/IIA/TP2/src/main.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/bin/release/Nuno/IIA/TP2/Makefile",
+		"/C/Users/Rodrigo Reis/Desktop/Nova pasta (2)/SO/Meta 1/.gitignore",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/admin/command_manager.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/RAT_V2/include/defs.h",
+		"/C/Users/Rodrigo Reis/Desktop/teste.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/Pequenos_programa/screenshot.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/Pequenos_programa/msg.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/Pequenos_programa/MakeFile",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/Keylog/keylog.c",
+		"/C/Users/Rodrigo Reis/Desktop/KITVirus/Keylog/25-11-2023.txt",
+		"/C/Users/Rodrigo Reis/Desktop/RAT_V2/admin/main.c",
+		"/C/Users/Rodrigo Reis/Desktop/RAT_V2/victim/victim.c",
+		"/C/Users/Rodrigo Reis/Desktop/RAT_V2/include/defs.h",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/src/GerenciadorComandos.cpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/src/Comandos.cpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/src/Interface.cpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/include/Interface.hpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/src/Simulador.cpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/include/Simulador.hpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/Makefile",
+		"/C/Users/Rodrigo Reis/Desktop/TesteMakeFile/makefile",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/src/Habitacao.cpp",
+		"/C/Users/Rodrigo Reis/Desktop/TrabalhoDePoo/TrabalhoDePoo/include/Aparelhos.hpp",
+		"/C/Users/Rodrigo Reis/Documents/Teste/main.c",
+		"/C/Users/Rodrigo Reis/Documents/py/main.py",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/main.cpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/Comandos.cpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/Interface.cpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/include/Habitacao.hpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/include/Comandos.hpp",
+		"/C/Users/Rodrigo Reis/AppData/Roaming/Sublime Text/Packages/User/command_class.sublime-snippet",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/GerenciadorComandos.cpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/include/GerenciadorComandos.hpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/Zona.cpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/include/Simulador.hpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/include/Zona.hpp",
+		"/C/Users/Rodrigo Reis/Documents/TrabalhoDePoo/src/compile_flags.txt"
+	],
+	"find":
+	{
+		"height": 31.0
+	},
+	"find_in_files":
+	{
+		"height": 143.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "raylib_game.rc",
+					"selected": true,
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 746,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"lsp_uri": "file:///C:/Users/Rodrigo%20Reis/Documents/game-jam2023/src/raylib_game.rc",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 31.0
+	},
+	"input":
+	{
+		"height": 59.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.LSP Log Panel":
+	{
+		"height": 0.0
+	},
+	"output.Terminus":
+	{
+		"height": 62.0
+	},
+	"output.diagnostics":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 342.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"output.references":
+	{
+		"height": 138.0
+	},
+	"pinned_build_system": "Packages/Makefile/Make.sublime-build",
+	"project": "gamejam.sublime-project",
+	"replace":
+	{
+		"height": 58.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"vic",
+				"victim\\victim.c"
+			],
+			[
+				"inter",
+				"include\\Interface.hpp"
+			],
+			[
+				"simul",
+				"src\\Simulador.cpp"
+			],
+			[
+				"inte",
+				"src\\Interface.cpp"
+			],
+			[
+				"INTER",
+				"include\\Interface.hpp"
+			],
+			[
+				"sim",
+				"include\\Simulador.hpp"
+			],
+			[
+				"ain",
+				"src\\main.cpp"
+			],
+			[
+				"main",
+				"src\\main.cpp"
+			],
+			[
+				"hab",
+				"include\\Habitacao.hpp"
+			],
+			[
+				"ma",
+				"src\\main.cpp"
+			],
+			[
+				"comand",
+				"src\\GerenciadorComandos.cpp"
+			],
+			[
+				"Com",
+				"src\\Comandos.cpp"
+			],
+			[
+				"COMAND",
+				"include\\Comandos.hpp"
+			],
+			[
+				"coman",
+				"include\\Comandos.hpp"
+			],
+			[
+				"gere",
+				"include\\GerenciadorComandos.hpp"
+			],
+			[
+				"zona",
+				"include\\Zona.hpp"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 280.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
