@@ -18,14 +18,17 @@ SpaceShip CreateSpaceShip(float x,float y)
 	return s; 
 }
 
-void UpdateBullet(Bullet* b)
+
+void UpdateEntity(struct Entity* b)
 {
 	b->position.x -= b->velocity.x * GetFrameTime();
 	b->position.y -= b->velocity.y * GetFrameTime();
 
+/*
 	if (b->position.x < 0 || b->position.x > SCREEN_WIDTH || b->position.y < 0 || b->position.y > SCREEN_HEIGHT){
 		b->isAlive = 0;
 	}
+*/
 }
 
 void UpdateSpaceShip(SpaceShip* s)

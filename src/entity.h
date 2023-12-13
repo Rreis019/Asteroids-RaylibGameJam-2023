@@ -14,11 +14,8 @@ typedef struct Entity
 	unsigned char isAlive;
 }Asteroid,SpaceShip,Bullet;
 
-
-
-void UpdateBullet(Bullet* b);
-
 SpaceShip CreateSpaceShip(float x,float y);
 void UpdateSpaceShip(SpaceShip* s);
 
-void DrawEntity(struct Entity *ent);
+void UpdateEntity(struct Entity* b);
+void DrawEntity(struct Entity* ent);

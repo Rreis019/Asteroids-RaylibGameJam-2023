@@ -12,6 +12,7 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include <time.h>
 
 #if defined(PLATFORM_WEB)
     #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
@@ -68,6 +69,7 @@ static void UpdateDrawFrame();      // Update and Draw one frame
 Texture m;
 int main(void)
 {
+    srand(time(NULL));
 #if !defined(_DEBUG)
     SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messsages
 #endif
@@ -156,9 +158,9 @@ void UpdateDrawFrame(void)
        DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
                            (Rectangle){ (GetScreenWidth() - ((float)SCREEN_WIDTH*scale))*0.5f, (GetScreenHeight() - ((float)SCREEN_HEIGHT*scale))*0.5f,
                            (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-        // TODO: Draw everything that requires to be drawn at this point, maybe UI?
+     // TODO: Draw everything that requires to be drawn at this point, maybe UI?
        // GuiButton((Rectangle){0,0,170,40}, "Teste");
-
+       DrawGameGui();
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }

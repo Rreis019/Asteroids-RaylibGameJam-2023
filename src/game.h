@@ -1,3 +1,4 @@
+#pragma once
 #include "raylib.h"
 #include "entity.h"
 #include "hud.h"
@@ -14,6 +15,9 @@ typedef enum
 	IMG_SPACESHIP,
 	IMG_BULLET,
 	IMG_SPACE_BACKGROUND,
+	IMG_SPACE_LIFE,
+	IMG_METEOR_BROWN_BIG,
+	IMG_METEOR_BROWN_SMALL = 8,
 	MAX_TEXTURES
 }IMAGE_ID;
 
@@ -33,12 +37,12 @@ typedef struct
 extern Game game;
 
 void InitGame();
-void AddAsteroid(Asteroid asteroid);
+void AddAsteroid();
 void AddBullet(Vector2 position,Vector2 velocity,float rotation);
 void RemoveBullet(int index);
 
 void LoadResources();
 void DrawGame(void);
-void DrawGui(void);
+void DrawGameGui(void);
 
 //void AddAsteroid(Asteroid a)

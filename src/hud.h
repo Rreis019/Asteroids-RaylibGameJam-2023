@@ -1,3 +1,6 @@
+#pragma once
+
+#define MAX_LIFES 3
 
 typedef struct
 {
@@ -5,3 +8,5 @@ typedef struct
 	int score;
 }Hud;
 
+Hud  CreateHud(void);
+void DrawHud(Hud* hud);
