@@ -12,8 +12,6 @@
 ********************************************************************************************/
 
 #include "raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
 
 #if defined(PLATFORM_WEB)
     #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
@@ -23,6 +21,9 @@
 #include <stdio.h>                          // Required for: printf()
 #include <stdlib.h>                         // Required for: 
 #include <string.h>                         // Required for: 
+
+#include "game.h"
+
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -51,9 +52,6 @@ typedef enum {
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
-static const int screenWidth = 1280;
-static const int screenHeight = 720;
-
 static RenderTexture2D target = { 0 };  // Render texture to render our game
 
 // TODO: Define global variables here, recommended to make them static
@@ -61,26 +59,31 @@ static RenderTexture2D target = { 0 };  // Render texture to render our game
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
-static void UpdateDrawFrame(void);      // Update and Draw one frame
+static void UpdateDrawFrame();      // Update and Draw one frame
 
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
+
+Texture m;
 int main(void)
 {
 #if !defined(_DEBUG)
     SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messsages
 #endif
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+
 
     // Initialization
     //--------------------------------------------------------------------------------------
-    InitWindow(screenWidth, screenHeight, "raylib gamejam template");
-    
-    // TODO: Load resources / Initialize variables at this point
-    
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib gamejam template");
+    InitGame();
+//    LoadResources();
+ //   game.player =  CreateSpaceShip(300,300);
+
     // Render texture to draw full screen, enables screen scaling
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
-    target = LoadRenderTexture(screenWidth, screenHeight);
+    target = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
 
 #if defined(PLATFORM_WEB)
@@ -108,6 +111,9 @@ int main(void)
     return 0;
 }
 
+
+
+
 //--------------------------------------------------------------------------------------------
 // Module functions definition
 //--------------------------------------------------------------------------------------------
@@ -123,24 +129,35 @@ void UpdateDrawFrame(void)
     //----------------------------------------------------------------------------------
     // Render game screen to a texture, 
     // it could be useful for scaling or further sahder postprocessing
+
+
     BeginTextureMode(target);
         ClearBackground(RAYWHITE);
         
         // TODO: Draw your game screen here
-        DrawRectangle(10, 10, screenWidth - 20, screenHeight - 20, SKYBLUE);
-        
+       // DrawRectangle(10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20, SKYBLUE);
+        DrawGame();
+
+
+        //DrawTexture(m, 0,0, WHITE); 
+    //DrawTextureRec(m, (Rectangle){ 0.0f, 0.0f, 32.0f, 32.0f }, (Vector2){ 100, 100 }, WHITE);
+
     EndTextureMode();
     
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+    float scale = MIN((float)GetScreenWidth()/SCREEN_WIDTH, (float)GetScreenHeight()/SCREEN_HEIGHT);
     // Render to screen (main framebuffer)
     BeginDrawing();
-        ClearBackground(RAYWHITE);
+       ClearBackground(BLACK);     // Clear screen background
         
 
         // Draw render texture to screen, scaled if required
-        DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-
+        
+       DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
+                           (Rectangle){ (GetScreenWidth() - ((float)SCREEN_WIDTH*scale))*0.5f, (GetScreenHeight() - ((float)SCREEN_HEIGHT*scale))*0.5f,
+                           (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
         // TODO: Draw everything that requires to be drawn at this point, maybe UI?
-        GuiButton((Rectangle){0,0,170,40}, "Teste");
+       // GuiButton((Rectangle){0,0,170,40}, "Teste");
 
     EndDrawing();
     //----------------------------------------------------------------------------------  
