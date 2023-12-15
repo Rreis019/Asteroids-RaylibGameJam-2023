@@ -106,7 +106,7 @@ int main(void)
     UnloadRenderTexture(target);
     
     // TODO: Unload all loaded resources at this point
-
+    DestroyGame();
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 

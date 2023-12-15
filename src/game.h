@@ -1,10 +1,12 @@
 #pragma once
+#include "chipmunk/chipmunk_types.h"
 #include "raylib.h"
+#include "chipmunk/chipmunk.h"
 #include "entity.h"
 #include "hud.h"
 
 
-#define MAX_ASTEROIDS 50
+#define MAX_ASTEROIDS 15
 #define MAX_BULLETS 500
 
 #define SCREEN_WIDTH 1280
@@ -30,6 +32,8 @@ typedef struct
 	Bullet bullets[MAX_BULLETS];
 	int nBullets;
 
+	cpSpace *space;
+
 	Hud hud;
 	Texture2D textures[MAX_TEXTURES];
 }Game;
@@ -37,8 +41,10 @@ typedef struct
 extern Game game;
 
 void InitGame();
+void DestroyGame();
+
 void AddAsteroid();
-void AddBullet(Vector2 position,Vector2 velocity,float rotation);
+void AddBullet(cpVect position,cpVect velocity,cpFloat angle);
 void RemoveBullet(int index);
 
 void LoadResources();
