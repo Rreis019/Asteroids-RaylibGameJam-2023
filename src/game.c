@@ -1,83 +1,88 @@
 #include "game.h"
 #include "chipmunk/chipmunk_types.h"
 #include "entity.h"
+#include "hud.h"
 #include "raylib.h"
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "chipmunk/chipmunk.h"
 
 Game game;
+
+cpBool BulletvsAsteroidBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
+{
+  	cpShape *a, *b;
+    cpArbiterGetShapes(arb, &a, &b);
+	Bullet* bulletEntity = (Bullet*)cpShapeGetUserData(a);
+    Asteroid* asteroidEntity = (Asteroid*)cpShapeGetUserData(b);
+	
+    bulletEntity->isAlive = 0;
+    asteroidEntity->isAlive = 0;
+    AddScore(&game.hud,100);
+	return cpTrue;
+}
+
+cpBool PlayerVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
+{
+	cpShape *a, *b;
+    cpArbiterGetShapes(arb, &a, &b);
+
+    cpCollisionType type = cpShapeGetCollisionType(b); 
+
+    if(type == PLAYER_BULLET_COLISSION_TYPE){return cpTrue;}
+
+	SpaceShip* player = (SpaceShip*)cpShapeGetUserData(a);
+	
+	printf("hurt\n");
+	if(player->hurtAnimation){return cpTrue;}
+	player->lastTimeHurt = GetTime();
+	player->hurtAnimation = true;
+	player->health--;
+	
+	return cpTrue;
+}
+
 
 void InitGame()
 {
 	LoadResources();
  	game.space = cpSpaceNew();
-	game.hud =     CreateHud();
  	game.player =  CreateSpaceShip(cpv(300,300));
+	game.hud =     CreateHud(&game.player->health);
  	cpVect gravity = cpv(0,0);
 	cpSpaceSetGravity(game.space, gravity);
+	
+	cpCollisionHandler *handlerBulletVsAsteroid = cpSpaceAddCollisionHandler(game.space, PLAYER_BULLET_COLISSION_TYPE, ASTEROID_COLISSION_TYPE);
+	handlerBulletVsAsteroid->beginFunc = BulletvsAsteroidBegin;
+
+	cpCollisionHandler* handlerPlayer =  cpSpaceAddWildcardHandler(game.space,PLAYER_COLLISION_TYPE);
+	handlerPlayer->beginFunc = PlayerVsAnyBegin;
 }
 
 void DestroyGame()
 {
-	for (int i = 0; i < MAX_TEXTURES; ++i)
-	{
-		UnloadTexture(game.textures[i]);
-	}
-
+	for (int i = 0; i < game.nAsteroids; ++i){DestroyEntity(game.asteroids[i]);}
+	for (int i = 0; i < game.nBullets; ++i){  DestroyEntity(game.bullets[i]);}
+	for (int i = 0; i < MAX_TEXTURES; ++i){UnloadTexture(game.textures[i]);}
 	cpSpaceFree(game.space);
 }
 
-void AddAsteroid()
-{
+void AddAsteroid(Asteroid* a){
     if(game.nAsteroids == MAX_ASTEROIDS) {return;}
-
-    cpSpace* space = game.space;
-    Asteroid a;
-    #define RADIUS 5.0f
-    a.body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForCircle(1.0f, 0, RADIUS, cpvzero)));
-    a.shape = cpSpaceAddShape(space, cpCircleShapeNew(a.body, RADIUS, cpvzero));
-    cpShapeSetFriction(a.shape, 0.7); // Defina o coeficiente de atrito conforme necessário
-
-    // Definir a posição do asteroide com base na aleatoriedade
-    cpVect asteroidPosition = cpv(0, 0);
-    int side = rand() % 4;
-    switch (side) {
-        case 0: //TOP-SCREEN
-            asteroidPosition.x = rand() % SCREEN_WIDTH;
-            asteroidPosition.y -= RADIUS;
-            break;
-        case 1: //TOP-LEFT-SCREEN
-            asteroidPosition.x = -RADIUS;
-            asteroidPosition.y = rand() % SCREEN_HEIGHT;
-            break;
-        case 2: //TOP-RIGHT-SCREEN
-            asteroidPosition.x = SCREEN_WIDTH + RADIUS;
-            asteroidPosition.y = rand() % SCREEN_HEIGHT;
-            break;
-        case 3: //BOTTOM-SCREEN
-            asteroidPosition.x = rand() % SCREEN_WIDTH;
-            asteroidPosition.y = SCREEN_HEIGHT + RADIUS;
-            break;
-    }
-
-    cpBodySetPosition(a.body, asteroidPosition);
-
-    // Definir a velocidade do asteroide
-    cpVect asteroidVelocity = cpv((float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED), (float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED));
-    cpBodySetVelocity(a.body, asteroidVelocity);
-
-    // Armazenar informações do asteroide no jogo
-    // GameAsteroid é uma estrutura que guarda informações do asteroide
     game.asteroids[game.nAsteroids++] = a;
 }
 
-void RemoveBullet(int index)
-{
-    if (index >= 0 && index < game.nBullets)
-    {
-        for (int i = index; i < game.nBullets - 1; i++)
-        {
+void AddBullet(Bullet* b){
+	if(MAX_BULLETS == game.nBullets){ return;}
+	game.bullets[game.nBullets++] = b;
+}
+
+void RemoveBullet(int index){
+    if (index >= 0 && index < game.nBullets){
+		DestroyEntity(game.bullets[index]);
+        for (int i = index; i < game.nBullets - 1; i++){
             game.bullets[i] = game.bullets[i + 1];
         }
         game.nBullets--;
@@ -86,37 +91,14 @@ void RemoveBullet(int index)
 
 void RemoveAsteroid(int index){
 	if(index >= 0 && index < game.nAsteroids){
-		for (int i = index; i < game.nAsteroids - 1; ++i)
-		{
+		DestroyEntity(game.asteroids[index]);
+		for (int i = index; i < game.nAsteroids - 1; ++i){
 			game.asteroids[i] = game.asteroids[i+1];
 		}
 		game.nAsteroids--;
 	}
-
 }
 
-
-void AddBullet(cpVect position,cpVect velocity,cpFloat angle)
-{
-	if(MAX_BULLETS == game.nBullets){ return;}
-
-	Bullet b;
-	//b.velocity = velocity;
-	//b.rotation = rotation;
-	b.texture = &game.textures[IMG_BULLET];
-	b.textWidth =  b.texture->width;
-	b.textHeight = b.texture->height;
-	b.isAlive = 1;
-
-	b.body  = cpSpaceAddBody(game.space,cpBodyNew(1.0, cpMomentForBox(1.0f,b.textWidth,b.textHeight)));
-	cpBodySetPosition(b.body, position);
-	cpBodySetType(b.body, CP_BODY_TYPE_DYNAMIC);
-	cpBodySetAngle(b.body,angle);
-	b.shape = cpSpaceAddShape(game.space,cpBoxShapeNew(b.body,b.textWidth,b.textHeight,0));
-	cpBodySetVelocity(b.body, velocity);
-	cpShapeSetSensor(b.shape, 1);
-	game.bullets[game.nBullets++] = b;
-}
 
 
 void LoadResources()
@@ -125,7 +107,7 @@ void LoadResources()
 	game.textures[IMG_BULLET] = LoadTexture("resources/bulletBlue.png");
 	game.textures[IMG_SPACE_BACKGROUND] = LoadTexture("resources/black.png");
 	game.textures[IMG_SPACE_LIFE] = LoadTexture("resources/playerLife3_blue.png");
-
+	game.textures[IMG_SPACE_SHIP_THURST] = LoadTexture("resources/thurst.png");
 	for (int i = 0; i < 4; ++i)
 	{
 		game.textures[IMG_METEOR_BROWN_BIG + i] = LoadTexture(TextFormat("resources/Meteors/meteorBrown_big%d.png",i+1));
@@ -155,14 +137,16 @@ void DrawBackground()
 
 void SpawnAsteroids()
 {
-	for (int i = 0; i < MAX_ASTEROIDS; ++i)
+	int count = MAX_ASTEROIDS - game.nAsteroids;
+	static float lastTimeSpawn = 0;
+	for (int i = 0; i < count; ++i)
 	{
-		AddAsteroid();
+		if(GetTime() > lastTimeSpawn){
+			AddAsteroid(CreateAsteroid());
+			lastTimeSpawn = GetTime() + 0.5f;
+		}
 	}
 }
-
-#include "chipmunk/chipmunk.h"
-
 
 void IterateShapes(cpBody* body, cpShape *shape, void *data) {
     cpBB bb = cpShapeGetBB(shape);
@@ -176,24 +160,33 @@ void IterateShapes(cpBody* body, cpShape *shape, void *data) {
     DrawRectangleLines(position.x - width / 2, position.y - height / 2, width, height, WHITE);
 }
 
-void IterateBodies(cpBody *body, void *data) {
-    cpBodyEachShape(body, IterateShapes, NULL);
-}
+void IterateBodies(cpBody *body, void *data) {cpBodyEachShape(body, IterateShapes, NULL);}
+void DrawColliders(cpSpace *space) {cpSpaceEachBody(space, IterateBodies, NULL);}
 
-void DrawColliders(cpSpace *space) {
-    cpSpaceEachBody(space, IterateBodies, NULL);
-}
 
+void RestartGame(void)
+{
+	game.player->health = 3;
+	game.hud.realScore = game.hud.displayScore = 0;
+	cpBodySetPosition(game.player->base.body, cpv((float)SCREEN_WIDTH/2,(float)SCREEN_HEIGHT/2));
+	for (int i = 0; i < game.nAsteroids; ++i){DestroyEntity(game.asteroids[i]);}
+	for (int i = 0; i < game.nBullets; ++i){DestroyEntity(game.bullets[i]);}
+	game.nAsteroids = 0;
+	game.nBullets = 0;
+}
 
 void DrawGame(void)
 {
+	if(game.player->health == 0){RestartGame();}
+
 	cpSpaceStep(game.space, GetFrameTime());
 	
+
 	DrawBackground();
-	//SpawnAsteroids();
+	SpawnAsteroids();
 	for (int i = 0; i < game.nBullets; ++i)
 	{
-		Bullet* bullet = &game.bullets[i];
+		Bullet* bullet = game.bullets[i];
 		if(bullet->isAlive == 0){
 			RemoveBullet(i);
 			i--;
@@ -204,26 +197,51 @@ void DrawGame(void)
 		DrawEntity(bullet);
 	}
 
-	for (int i = 0; i < game.nAsteroids; ++i)
-	{
-		Asteroid* asteroid = &game.asteroids[i];
+
+	for (int i = 0; i < game.nAsteroids; ++i){
+		Asteroid* asteroid = game.asteroids[i];
 		if(asteroid->isAlive == 0){
 			RemoveAsteroid(i);
 			i--;
 			continue;
 		}
-
-
 		UpdateEntity(asteroid);
 		DrawEntity(asteroid);
 	}
 
-	UpdateSpaceShip(&game.player);
-	DrawEntity(&game.player);
+	UpdateSpaceShip(game.player);
+
+	static bool draw = true;
+	if(game.player->hurtAnimation && GetTime() > game.player->lastTimeHurt + INVICIBLE_TIME_SECONDS){
+		game.player->hurtAnimation = false;	
+		draw = true;
+	}
+
+	if(game.player->hurtAnimation){
+		static float lastTimeSecond = 0;
+
+		if(GetTime() > lastTimeSecond + 0.1){
+			lastTimeSecond = GetTime();
+			draw = !draw;
+		}
+
+
+	}
+		if(draw){DrawEntity((Entity*)game.player);}
+
+
+
 
 	DrawColliders(game.space);
 
-	DrawFPS(30, 30);
+	//DrawFPS(30, 30);
+
+	if(IsKeyPressed(KEY_F1)){
+		for (int i = 0; i < game.nAsteroids; ++i)
+		{
+		}
+	}
+
 }
 
 void DrawGameGui(void)
