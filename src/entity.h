@@ -5,7 +5,7 @@
 
 #define FIRE_RATE_SECONDS 0.1
 #define BULLET_SPEED 1000
-#define ASTEROID_SPEED 300
+#define ASTEROID_SPEED 600
 
 enum CollisionType
 {
@@ -25,28 +25,15 @@ typedef struct
 }Asteroid,Bullet,Entity;
 
 
+
+
 #define INVICIBLE_TIME_SECONDS 0.3
 
-typedef struct
-{
-	Entity base;
-	int health;
-	bool hurtAnimation;
-	float  lastTimeHurt;
-
-	int level;
-	float experience;
-	float  nextLevelXp;
-}SpaceShip;
 
 
-void GainExperience(SpaceShip* player,int xp);
-
-SpaceShip* CreateSpaceShip(cpVect position);
 Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle);
 Asteroid* CreateAsteroid();
 
-void UpdateSpaceShip(SpaceShip* s);
 
 void UpdateAsteroid(Entity* b);
 void UpdateEntity(Entity* b);

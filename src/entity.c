@@ -1,35 +1,12 @@
 #include "entity.h"
 #include "chipmunk/chipmunk.h"
+#include "chipmunk/chipmunk_types.h"
+#include "controller.h"
 #include "game.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-SpaceShip* CreateSpaceShip(cpVect position)
-{
-	SpaceShip* spaceShip = malloc(sizeof(SpaceShip));
-	Entity* ent = (Entity*)spaceShip;
-    ent->textHeight =  64;
-	ent->textWidth  =  64;
-	ent->texture = &game.textures[IMG_SPACESHIP];
-    spaceShip->health = 3;
-	ent->body  = cpSpaceAddBody(game.space,cpBodyNew(1.0, cpMomentForBox(1.0f,ent->textWidth,ent->textHeight)));
-	cpBodySetPosition(ent->body, position);
-	cpBodySetType(ent->body, CP_BODY_TYPE_DYNAMIC);
-	cpBodySetAngle(ent->body, 0);
- 	cpBodySetMoment(ent->body, INFINITY);
-	ent->shape = cpSpaceAddShape(game.space,cpBoxShapeNew(ent->body,ent->textWidth,ent->textHeight,0));
-    cpShapeSetElasticity(ent->shape, 0.8);
-    cpShapeSetUserData(ent->shape,spaceShip);
-    spaceShip->hurtAnimation = false;
-
-    spaceShip->nextLevelXp = 150;
-    spaceShip->experience = 0;
-    spaceShip->level = 0;
-
-	return spaceShip; 
-}
 
 Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle)
 {
@@ -61,166 +38,112 @@ double randomInRange(double min, double max) {
 Asteroid* CreateAsteroid()
 {
     Asteroid* asteroid = (Asteroid*)malloc(sizeof(Asteroid));
-	cpSpace* space = game.space;
+    cpSpace* space = game.space;
     #define RADIUS 5.0f
     asteroid->texture = &game.textures[IMG_METEOR_BROWN_BIG];
-   	asteroid->textWidth = asteroid->texture->width;
-   	asteroid->textHeight = asteroid->texture->height;
-   	asteroid->isAlive = 1;
-    asteroid->body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f,50.0f,50.0f)));
-    asteroid->shape = cpSpaceAddShape(space, cpBoxShapeNew(asteroid->body,50,50,0));
+    asteroid->textWidth = asteroid->texture->width;
+    asteroid->textHeight = asteroid->texture->height;
+    asteroid->isAlive = 1;
+    asteroid->body = cpSpaceAddBody(space, cpBodyNew(1.0f, cpMomentForBox(1.0f, 50.0f, 50.0f)));
+    asteroid->shape = cpSpaceAddShape(space, cpBoxShapeNew(asteroid->body, 50, 50, 0));
     cpShapeSetFriction(asteroid->shape, 0.7); // Defina o coeficiente de atrito conforme necessário
-   	cpBodySetMoment(asteroid->body, INFINITY);
-   	cpBodySetAngle(asteroid->body, 0);
+    cpBodySetMoment(asteroid->body, INFINITY);
+    cpBodySetAngle(asteroid->body, 0);
     cpShapeSetElasticity(asteroid->shape, 0.8);
-  	cpShapeSetUserData(asteroid->shape, asteroid);
-  	cpShapeSetCollisionType(asteroid->shape,ASTEROID_COLISSION_TYPE);
+    cpShapeSetUserData(asteroid->shape, asteroid);
+    cpShapeSetCollisionType(asteroid->shape, ASTEROID_COLISSION_TYPE);
+    
     // Definir a posição do asteroide com base na aleatoriedade
     cpVect asteroidPosition = cpv(0, 0);
     int side = rand() % 4;
+    cpVect asteroidVelocity;
+    Camera2D* cam = &game.camera;
+
     switch (side) {
-        case 0: //TOP-SCREEN
-            asteroidPosition.x = rand() % SCREEN_WIDTH;
-            asteroidPosition.y -= RADIUS;
+        case 0: // TOP-SCREEN
+            asteroidPosition.x =  cam->target.x - rand() % SCREEN_WIDTH;
+            asteroidPosition.y = cam->target.y - (SCREEN_HEIGHT / (2 * cam->zoom)) - RADIUS;
+            asteroidVelocity = cpv(0, ASTEROID_SPEED); // Mover para baixo (direção positiva y)
             break;
-        case 1: //TOP-LEFT-SCREEN
-            asteroidPosition.x = -RADIUS;
-            asteroidPosition.y = rand() % SCREEN_HEIGHT;
+        case 1: // TOP-LEFT-SCREEN
+            asteroidPosition.x = cam->target.x - (SCREEN_WIDTH / (2 * cam->zoom)) - RADIUS;
+            asteroidPosition.y = cam->target.y -  rand() % SCREEN_HEIGHT;
+            asteroidVelocity = cpv(ASTEROID_SPEED, ASTEROID_SPEED); // Mover para a direita e para baixo
             break;
-        case 2: //TOP-RIGHT-SCREEN
-            asteroidPosition.x = SCREEN_WIDTH + RADIUS;
-            asteroidPosition.y = rand() % SCREEN_HEIGHT;
+        case 2: // TOP-RIGHT-SCREEN
+            asteroidPosition.x = cam->target.x + (SCREEN_WIDTH / (2 * cam->zoom)) + RADIUS;
+            asteroidPosition.y = cam->target.y -  rand() % SCREEN_HEIGHT;
+            asteroidVelocity = cpv(-ASTEROID_SPEED, ASTEROID_SPEED); // Mover para a esquerda e para baixo
             break;
-        case 3: //BOTTOM-SCREEN
-            asteroidPosition.x = rand() % SCREEN_WIDTH;
-            asteroidPosition.y = SCREEN_HEIGHT + RADIUS;
+        case 3: // BOTTOM-SCREEN
+            asteroidPosition.x = cam->target.x - rand() % SCREEN_WIDTH;
+            asteroidPosition.y = cam->target.y + (SCREEN_HEIGHT / (2 * cam->zoom)) + RADIUS;
+            asteroidVelocity = cpv(0, -ASTEROID_SPEED); // Mover para cima (direção negativa y)
             break;
     }
 
     cpBodySetPosition(asteroid->body, asteroidPosition);
-    // Definir a velocidade do asteroide
-    cpVect asteroidVelocity = cpv(
-    	(float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED), 
-    	(float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED)
-	);
-    cpBodySetAngle(asteroid->body,randomInRange(0, 2 * PI));
+    cpBodySetAngle(asteroid->body, randomInRange(0, 2 * PI));
     cpBodySetVelocity(asteroid->body, asteroidVelocity);
+
     return asteroid;
+}
+
+
+bool isOutOfBound(Entity* b, Camera2D* cam) {
+    if(b->body == NULL) {
+        return false;
+    }
+
+    cpVect position = cpBodyGetPosition(b->body);
+    cpFloat textWidth = b->textWidth * 2;
+    cpFloat textHeight = b->textHeight * 2;
+
+    cpFloat cameraHalfWidth = SCREEN_WIDTH / (2 * cam->zoom);
+    cpFloat cameraHalfHeight = SCREEN_HEIGHT / (2 * cam->zoom);
+
+    cpFloat cameraLeft = cam->target.x - cameraHalfWidth;
+    cpFloat cameraRight = cam->target.x + cameraHalfWidth;
+    cpFloat cameraBottom = cam->target.y - cameraHalfHeight;
+    cpFloat cameraTop = cam->target.y + cameraHalfHeight;
+
+    cpFloat entityLeft = position.x - textWidth;
+    cpFloat entityRight = position.x + textWidth;
+    cpFloat entityBottom = position.y - textHeight;
+    cpFloat entityTop = position.y + textHeight;
+
+    return (entityRight < cameraLeft || entityLeft > cameraRight ||
+            entityTop < cameraBottom || entityBottom > cameraTop);
 }
 
 void UpdateEntity(Entity* b)
 {
-	if(b->body == NULL){return;}
-    cpVect position = cpBodyGetPosition(b->body);
-    cpFloat textWidth = b->textWidth * 2;
-    cpFloat textHeight = b->textHeight * 2;
-
-    cpFloat screenWidth = SCREEN_WIDTH + textWidth;
-    cpFloat screenHeight = SCREEN_HEIGHT + textHeight;
-
-    if (position.x < -textWidth*2 || position.x > screenWidth+textWidth ||
-        position.y < -textHeight*2 || position.y > screenHeight+textHeight)
-    {
-        b->isAlive = 0;
+    if(b->body == NULL) {
         return;
     }
+
+    Camera2D* cam = &game.camera;
+
+    if(isOutOfBound(b,cam)){
+        b->isAlive = 0;
+    }
 }
+
 void UpdateAsteroid(Entity* b)
 {
     if(b->body == NULL){return;}
-    cpVect position = cpBodyGetPosition(b->body);
-    cpFloat textWidth = b->textWidth * 2;
-    cpFloat textHeight = b->textHeight * 2;
-
-    cpFloat screenWidth = SCREEN_WIDTH + textWidth;
-    cpFloat screenHeight = SCREEN_HEIGHT + textHeight;
-
       cpFloat randomRotation = (cpFloat)rand() / RAND_MAX * 0.1f; // Variação de rotação, você pode ajustar esse valor
     cpFloat currentAngle = cpBodyGetAngle(b->body); // Obter o ângulo atual
     cpBodySetAngle(b->body, currentAngle + randomRotation); // Definir um novo ângulo somando a rotação aleatória
 
 
-    if (position.x < -textWidth*2 || position.x > screenWidth+textWidth ||
-        position.y < -textHeight*2 || position.y > screenHeight+textHeight)
-    {
+    Camera2D* cam = &game.camera;
+
+    if(isOutOfBound(b,cam)){
         b->isAlive = 0;
-        return;
     }
 }
 
-
-void UpdateSpaceShip(SpaceShip* spaceShip)
-{
-    Entity* ent = (Entity*)spaceShip;
-
-    cpVect position = cpBodyGetPosition(ent->body);
-    if (position.x < 0) cpBodySetPosition(ent->body, cpv(SCREEN_WIDTH, position.y));
-    if (position.x > SCREEN_WIDTH) cpBodySetPosition(ent->body, cpv(0, position.y));
-    if (position.y < 0) cpBodySetPosition(ent->body, cpv(position.x, SCREEN_HEIGHT));
-    if (position.y > SCREEN_HEIGHT) cpBodySetPosition(ent->body, cpv(position.x, 0));
-
-    cpFloat angle = cpBodyGetAngle(ent->body);
-    // Atualizar a rotação do corpo baseado nos controles do jogador
-    if (IsKeyDown(KEY_A)){
-        angle -= DEG2RAD * 6;
-        cpBodySetAngle(ent->body,  angle);
-    }
-    if (IsKeyDown(KEY_D)){
-        angle += DEG2RAD * 6;
-        cpBodySetAngle(ent->body, angle);
-    }
-
-
-	if (IsKeyDown(KEY_SPACE))
-	{
-	    static float lastTimeShoot = 0;
-	    if (GetTime() > lastTimeShoot + FIRE_RATE_SECONDS)
-	    {
-	        lastTimeShoot = GetTime();
-
-           	cpFloat angle = cpBodyGetAngle(ent->body);
-	   		float rotationRadians = angle +DEG2RAD * 90;
-	   		cpVect bulletVelocity = cpBodyGetVelocity(ent->body);
-	        bulletVelocity.x += cos(rotationRadians) * -1000;
-	        bulletVelocity.y += sin(rotationRadians) * -1000;
-	        AddBullet(CreateBullet(cpBodyGetPosition(ent->body), bulletVelocity, angle));
-	    }
-	}
-
-	#define THRUST_FORCE 30
-	if (IsKeyDown(KEY_W))
-	{
-	    cpFloat angle = cpBodyGetAngle(ent->body);
-   		float rotationRadians = angle +DEG2RAD * 90;
-   		cpVect velocity = cpBodyGetVelocity(ent->body);
-        velocity.x += cos(rotationRadians) * -THRUST_FORCE;
-        velocity.y += sin(rotationRadians) * -THRUST_FORCE;
-		cpBodySetVelocity(ent->body, velocity);
-
-
-        Texture* fire = &game.textures[IMG_SPACE_SHIP_THURST];
-        Rectangle sourceRec = { 0.0f, 0.0f, fire->width, fire->height }; // Região completa da textura
-        
-        Vector2 flamePosition = { position.x, position.y + 100 }; 
-
-        // Desenha o fogo com uma rotação igual à da nave
-        DrawTexturePro(
-            *fire,
-            sourceRec,
-            (Rectangle){ flamePosition.x, flamePosition.y, fire->width, fire->height },
-            (Vector2){ (float)fire->width / 2, (float)fire->height / 2 },
-            RAD2DEG * angle,
-            WHITE
-        );
-    }
-
-    // Limitar a velocidade máxima da nave
-    #define MAX_SPEED 400
-    float magnitude = cpvlength(cpBodyGetVelocity(ent->body));
-    if (magnitude > MAX_SPEED){
-        cpBodySetVelocity(ent->body, cpvmult(cpBodyGetVelocity(ent->body), MAX_SPEED / magnitude));
-    }
-}
 
 void DrawEntity(Entity* ent)
 {
@@ -245,13 +168,3 @@ void DestroyEntity(Entity* ent) {
 
 
 
-void GainExperience(SpaceShip* player,int xp)
-{
-    player->experience += xp;
-
-    if(player->experience > player->nextLevelXp){
-        player->experience = player->experience -player->nextLevelXp;
-        player->level++;
-        player->nextLevelXp *= 1.2;
-    }
-}

@@ -1,8 +1,8 @@
 #include "game.h"
+#include "chipmunk/chipmunk.h"
 #include "entity.h"
 #include "raylib.h"
 #include <math.h>
-#include "chipmunk/chipmunk.h"
 #include <stdio.h>
 
 Game game;
@@ -30,7 +30,7 @@ cpBool PlayerVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 
     if(type == PLAYER_BULLET_COLISSION_TYPE){return cpTrue;}
 
-	SpaceShip* player = (SpaceShip*)cpShapeGetUserData(a);
+	Controller* player = (Controller*)cpShapeGetUserData(a);
 	
 	printf("hurt\n");
 	if(player->hurtAnimation){return cpTrue;}
@@ -46,7 +46,7 @@ void InitGame()
 {
 	LoadResources();
  	game.space = cpSpaceNew();
- 	game.player =  CreateSpaceShip(cpv(300,300));
+ 	game.player =  CreateController(cpv(300,300));
 	game.hud =     CreateHud(&game.player->health);
 	game.pause = false;
  	cpVect gravity = cpv(0,0);
@@ -57,6 +57,16 @@ void InitGame()
 
 	cpCollisionHandler* handlerPlayer =  cpSpaceAddWildcardHandler(game.space,PLAYER_COLLISION_TYPE);
 	handlerPlayer->beginFunc = PlayerVsAnyBegin;
+
+	Camera2D camera = { 0 };
+
+	cpVect position = cpBodyGetPosition(game.player->base.body);
+
+	camera.target = (Vector2){ position.x, position.y };
+	camera.offset = (Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+	camera.rotation = 0.0f;
+	camera.zoom = 1.0f;
+	game.camera = camera;
 }
 
 void DestroyGame()
@@ -76,28 +86,6 @@ void AddBullet(Bullet* b){
 	if(MAX_BULLETS == game.nBullets){ return;}
 	game.bullets[game.nBullets++] = b;
 }
-
-void RemoveBullet(int index){
-    if (index >= 0 && index < game.nBullets){
-		DestroyEntity(game.bullets[index]);
-        for (int i = index; i < game.nBullets - 1; i++){
-            game.bullets[i] = game.bullets[i + 1];
-        }
-        game.nBullets--;
-    }
-}
-
-void RemoveAsteroid(int index){
-	if(index >= 0 && index < game.nAsteroids){
-		DestroyEntity(game.asteroids[index]);
-		for (int i = index; i < game.nAsteroids - 1; ++i){
-			game.asteroids[i] = game.asteroids[i+1];
-		}
-		game.nAsteroids--;
-	}
-}
-
-
 
 void LoadResources()
 {
@@ -141,7 +129,7 @@ void SpawnAsteroids()
 	{
 		if(GetTime() > lastTimeSpawn){
 			AddAsteroid(CreateAsteroid());
-			lastTimeSpawn = GetTime() + 0.5f;
+			lastTimeSpawn = GetTime() + 0.2f;
 		}
 	}
 }
@@ -173,72 +161,72 @@ void RestartGame(void)
 	game.nBullets = 0;
 }
 
+
+typedef void (*tpFunc)(Entity* ent);
+void UpdateCollectionEntity(Entity** entities,int* nEnts,tpFunc updateEnt,tpFunc drawEnt,tpFunc destroyEnt)
+{
+	for (int index = 0; index < *nEnts; ++index)
+	{
+		Entity *ent = entities[index];
+
+		if(ent->isAlive == 0){
+			destroyEnt(entities[index]);
+	        for (int o = index; o < *nEnts - 1; o++){
+	            entities[o] = entities[o + 1];
+	        }
+	        *nEnts -= 1;
+			index--;
+			continue;
+		}
+		updateEnt(ent);
+		drawEnt(ent);
+	}
+}
+
+#include "particle.h"
+Emitter em;
 void DrawGame(void)
 {
 	if(game.player->health == 0){RestartGame();}
-
+	Camera2D * cam = &game.camera;
 	cpSpaceStep(game.space, GetFrameTime());
-	
-
 	DrawBackground();
 	SpawnAsteroids();
-	for (int i = 0; i < game.nBullets; ++i)
-	{
-		Bullet* bullet = game.bullets[i];
-		if(bullet->isAlive == 0){
-			RemoveBullet(i);
-			i--;
-			continue;
-		}
 
-		UpdateEntity(bullet);
-		DrawEntity(bullet);
-	}
+	BeginMode2D(game.camera);
+	UpdateCollectionEntity(game.bullets,&game.nBullets,UpdateEntity,DrawEntity,DestroyEntity);
+	UpdateCollectionEntity(game.asteroids,&game.nAsteroids,UpdateAsteroid,DrawEntity,DestroyEntity);
 
-
-	for (int i = 0; i < game.nAsteroids; ++i){
-		Asteroid* asteroid = game.asteroids[i];
-		if(asteroid->isAlive == 0){
-			RemoveAsteroid(i);
-			i--;
-			continue;
-		}
-		UpdateAsteroid(asteroid);
-		DrawEntity(asteroid);
-	}
-
-	UpdateSpaceShip(game.player);
-
-	static bool draw = true;
-	if(game.player->hurtAnimation && GetTime() > game.player->lastTimeHurt + INVICIBLE_TIME_SECONDS){
-		game.player->hurtAnimation = false;	
-		draw = true;
-	}
-
-	if(game.player->hurtAnimation){
-		static float lastTimeSecond = 0;
-
-		if(GetTime() > lastTimeSecond + 0.1){
-			lastTimeSecond = GetTime();
-			draw = !draw;
-		}
-
-
-	}
-		if(draw){DrawEntity((Entity*)game.player);}
-
-
-
-
+	UpdateController(game.player);
+	DrawController(game.player);
 	DrawColliders(game.space);
 
-	//DrawFPS(30, 30);
+	EndMode2D();
+	DrawParticles();
 
-	if(IsKeyPressed(KEY_F1)){
-		for (int i = 0; i < game.nAsteroids; ++i)
-		{
-		}
-	}
+	  float scroll = GetMouseWheelMove(); // Obtém o movimento do scroll do mouse
+
+    // Ajusta o zoom com base no movimento do scroll
+    cam->zoom += scroll;
+
+    // Limita o zoom a um valor mínimo e máximo (ajuste conforme necessário)
+    if (cam->zoom < 0.7f) cam->zoom = 0.7f;
+    if (cam->zoom > 1.0f) cam->zoom = 1.0f;
+
+
+    if (IsKeyPressed(KEY_F))
+    {
+    	Color red = RED;
+    	red.a = 0.0;
+    	Emitter* e = AddEmitter(
+    		(Vector2){SCREEN_WIDTH/2,SCREEN_HEIGHT/2},
+    		(Vector2){0,-2000},
+    		(Vector2){-200,200},
+    		(Vector2){0,0},
+    		 0.1,1.0,1.0f, ORANGE, red,(Vector2){20,20},(Vector2){105,105});
+    	//e->gravity = 100;
+    }
+
 
 }
 

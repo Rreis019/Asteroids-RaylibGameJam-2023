@@ -1,11 +1,12 @@
 #pragma once
+#include "controller.h"
 #include "raylib.h"
 #include "chipmunk/chipmunk.h"
 #include "entity.h"
 #include "hud.h"
 
 
-#define MAX_ASTEROIDS 7
+#define MAX_ASTEROIDS 50
 #define MAX_BULLETS 500
 
 #define SCREEN_WIDTH 1280
@@ -25,7 +26,8 @@ typedef enum
 
 typedef struct
 {
-	SpaceShip* player;
+	Camera2D camera;
+	Controller* player;
 	Asteroid* asteroids[MAX_ASTEROIDS];
 	int nAsteroids;
 
