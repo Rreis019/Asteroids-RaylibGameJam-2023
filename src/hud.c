@@ -1,9 +1,10 @@
-#include "hud.h"
-#include "raylib.h"
-#include "game.h"
-#include "raymath.h"
 #include <stdbool.h>
-#include <stdio.h>
+#include "raylib.h"
+#include "hud.h"
+#include "game.h"
+
+
+#include "raygui.h"
 
 Hud  CreateHud(int* playerHealth)
 {
@@ -21,7 +22,7 @@ void AddScore(Hud* hud,int score)
    growUp = true;
 }
 
-
+float t = 0.5;
 void DrawHud(Hud* hud)
 {
    #define MIN_FONT_SIZE 32
@@ -50,7 +51,6 @@ void DrawHud(Hud* hud)
       }
    }
 
-
    DrawText(TextFormat("%d",hud->displayScore), 10, 10, fontSize, WHITE);
    
    #define MARGIN_BETWEEN_LIFES 5
@@ -70,4 +70,15 @@ void DrawHud(Hud* hud)
 
 		 startPositionX -= game.textures[IMG_SPACE_LIFE].width + MARGIN_BETWEEN_LIFES;
    }
+
+   Rectangle bound;
+   bound.width = GetScreenWidth() * 0.5;
+   bound.height = 30;
+   bound.x = (float)GetScreenWidth()/2 - bound.width/2;
+   bound.y = GetScreenHeight() - (10+bound.height);
+   GuiProgressBar(bound, "", "",&game.player->experience, 0,game.player->nextLevelXp);
+
+
+
+   DrawText(TextFormat("LvL: %d",game.player->level + 1), bound.x + bound.width/2, bound.y - 30, 24, WHITE);
 }

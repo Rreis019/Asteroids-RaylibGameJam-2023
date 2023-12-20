@@ -24,6 +24,7 @@
 #include <string.h>                         // Required for: 
 
 #include "game.h"
+#include "screen.h"
 
 
 //----------------------------------------------------------------------------------
@@ -38,15 +39,6 @@
     #define LOG(...)
 #endif
 
-//----------------------------------------------------------------------------------
-// Types and Structures Definition
-//----------------------------------------------------------------------------------
-typedef enum { 
-    SCREEN_LOGO = 0, 
-    SCREEN_TITLE, 
-    SCREEN_GAMEPLAY, 
-    SCREEN_ENDING
-} GameScreen;
 
 // TODO: Define your custom data types here
 
@@ -54,6 +46,7 @@ typedef enum {
 // Global Variables Definition
 //----------------------------------------------------------------------------------
 static RenderTexture2D target = { 0 };  // Render texture to render our game
+ 
 
 // TODO: Define global variables here, recommended to make them static
 
@@ -74,42 +67,25 @@ int main(void)
     SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messsages
 #endif
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-
-
-    // Initialization
-    //--------------------------------------------------------------------------------------
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib gamejam template");
     InitGame();
-//    LoadResources();
- //   game.player =  CreateSpaceShip(300,300);
-
     // Render texture to draw full screen, enables screen scaling
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
     target = LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
 #else
-    SetTargetFPS(60);     // Set our game frames-per-second
-    //--------------------------------------------------------------------------------------
-
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button
-    {
+    SetTargetFPS(60);     
+    while (!WindowShouldClose()) {
         UpdateDrawFrame();
     }
 #endif
-
     // De-Initialization
-    //--------------------------------------------------------------------------------------
     UnloadRenderTexture(target);
     
-    // TODO: Unload all loaded resources at this point
     DestroyGame();
     CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
     return 0;
 }
 
@@ -122,45 +98,19 @@ int main(void)
 // Update and draw frame
 void UpdateDrawFrame(void)
 {
-    // Update
-    //----------------------------------------------------------------------------------
-    // TODO: Update variables / Implement example logic at this point
-    //----------------------------------------------------------------------------------
-
-    // Draw
-    //----------------------------------------------------------------------------------
-    // Render game screen to a texture, 
-    // it could be useful for scaling or further sahder postprocessing
-
-
     BeginTextureMode(target);
         ClearBackground(RAYWHITE);
-        
-        // TODO: Draw your game screen here
-       // DrawRectangle(10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20, SKYBLUE);
-        DrawGame();
-
-
-        //DrawTexture(m, 0,0, WHITE); 
-    //DrawTextureRec(m, (Rectangle){ 0.0f, 0.0f, 32.0f, 32.0f }, (Vector2){ 100, 100 }, WHITE);
-
+        DrawCurrentScreen();
     EndTextureMode();
-    
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+    #define MIN(a, b) (((a) < (b)) ? (a) : (b))
     float scale = MIN((float)GetScreenWidth()/SCREEN_WIDTH, (float)GetScreenHeight()/SCREEN_HEIGHT);
     // Render to screen (main framebuffer)
     BeginDrawing();
-       ClearBackground(BLACK);     // Clear screen background
-        
-
-        // Draw render texture to screen, scaled if required
-        
+      ClearBackground(RAYWHITE);     // Clear screen background
        DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
                            (Rectangle){ (GetScreenWidth() - ((float)SCREEN_WIDTH*scale))*0.5f, (GetScreenHeight() - ((float)SCREEN_HEIGHT*scale))*0.5f,
                            (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-     // TODO: Draw everything that requires to be drawn at this point, maybe UI?
-       // GuiButton((Rectangle){0,0,170,40}, "Teste");
-       DrawGameGui();
+       DrawCurrentScreenGui();
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }

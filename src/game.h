@@ -31,10 +31,11 @@ typedef struct
 
 	Bullet* bullets[MAX_BULLETS];
 	int nBullets;
-
 	cpSpace *space;
 	Hud hud;
 	Texture2D textures[MAX_TEXTURES];
+
+	bool pause;
 }Game;
 
 extern Game game;

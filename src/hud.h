@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #define MAX_LIFES 3
+#define MAX_LEVEL 30
 
 typedef struct
 {
@@ -9,6 +10,7 @@ typedef struct
 	int displayScore;
 	int realScore;
 	bool pulse;
+	float xp;
 }Hud;
 
 Hud  CreateHud(int* playerHealth);

@@ -14,13 +14,6 @@ enum CollisionType
 	PLAYER_BULLET_COLISSION_TYPE
 };
 
-enum AsteroidType
-{
-	BIG_ASTEROID,
-	SMALL_ASTEROID
-};
-
-
 typedef struct
 {
 	//float rotation;
@@ -40,8 +33,14 @@ typedef struct
 	int health;
 	bool hurtAnimation;
 	float  lastTimeHurt;
+
+	int level;
+	float experience;
+	float  nextLevelXp;
 }SpaceShip;
 
+
+void GainExperience(SpaceShip* player,int xp);
 
 SpaceShip* CreateSpaceShip(cpVect position);
 Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle);
@@ -49,6 +48,7 @@ Asteroid* CreateAsteroid();
 
 void UpdateSpaceShip(SpaceShip* s);
 
+void UpdateAsteroid(Entity* b);
 void UpdateEntity(Entity* b);
 void DrawEntity(Entity* ent);
 void DestroyEntity(Entity* ent);

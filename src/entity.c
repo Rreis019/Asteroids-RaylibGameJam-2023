@@ -10,9 +10,9 @@ SpaceShip* CreateSpaceShip(cpVect position)
 {
 	SpaceShip* spaceShip = malloc(sizeof(SpaceShip));
 	Entity* ent = (Entity*)spaceShip;
-	ent->texture = &game.textures[IMG_SPACESHIP];
     ent->textHeight =  64;
 	ent->textWidth  =  64;
+	ent->texture = &game.textures[IMG_SPACESHIP];
     spaceShip->health = 3;
 	ent->body  = cpSpaceAddBody(game.space,cpBodyNew(1.0, cpMomentForBox(1.0f,ent->textWidth,ent->textHeight)));
 	cpBodySetPosition(ent->body, position);
@@ -23,6 +23,11 @@ SpaceShip* CreateSpaceShip(cpVect position)
     cpShapeSetElasticity(ent->shape, 0.8);
     cpShapeSetUserData(ent->shape,spaceShip);
     spaceShip->hurtAnimation = false;
+
+    spaceShip->nextLevelXp = 150;
+    spaceShip->experience = 0;
+    spaceShip->level = 0;
+
 	return spaceShip; 
 }
 
@@ -47,6 +52,11 @@ Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle)
   	cpShapeSetCollisionType(bullet->shape,PLAYER_BULLET_COLISSION_TYPE);
 	return bullet;
 }
+
+double randomInRange(double min, double max) {
+    return min + ((double)rand() / RAND_MAX) * (max - min);
+}
+
 
 Asteroid* CreateAsteroid()
 {
@@ -93,6 +103,7 @@ Asteroid* CreateAsteroid()
     	(float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED), 
     	(float)(rand() % (2 * ASTEROID_SPEED) - ASTEROID_SPEED)
 	);
+    cpBodySetAngle(asteroid->body,randomInRange(0, 2 * PI));
     cpBodySetVelocity(asteroid->body, asteroidVelocity);
     return asteroid;
 }
@@ -114,6 +125,29 @@ void UpdateEntity(Entity* b)
         return;
     }
 }
+void UpdateAsteroid(Entity* b)
+{
+    if(b->body == NULL){return;}
+    cpVect position = cpBodyGetPosition(b->body);
+    cpFloat textWidth = b->textWidth * 2;
+    cpFloat textHeight = b->textHeight * 2;
+
+    cpFloat screenWidth = SCREEN_WIDTH + textWidth;
+    cpFloat screenHeight = SCREEN_HEIGHT + textHeight;
+
+      cpFloat randomRotation = (cpFloat)rand() / RAND_MAX * 0.1f; // Variação de rotação, você pode ajustar esse valor
+    cpFloat currentAngle = cpBodyGetAngle(b->body); // Obter o ângulo atual
+    cpBodySetAngle(b->body, currentAngle + randomRotation); // Definir um novo ângulo somando a rotação aleatória
+
+
+    if (position.x < -textWidth*2 || position.x > screenWidth+textWidth ||
+        position.y < -textHeight*2 || position.y > screenHeight+textHeight)
+    {
+        b->isAlive = 0;
+        return;
+    }
+}
+
 
 void UpdateSpaceShip(SpaceShip* spaceShip)
 {
@@ -165,8 +199,7 @@ void UpdateSpaceShip(SpaceShip* spaceShip)
 
 
         Texture* fire = &game.textures[IMG_SPACE_SHIP_THURST];
-        //DrawTexture(game.textures[IMG_SPACE_SHIP_THURST],position.x, position.y - cos(rotationRadians) * 100, WHITE);
-	   Rectangle sourceRec = { 0.0f, 0.0f, fire->width, fire->height }; // Região completa da textura
+        Rectangle sourceRec = { 0.0f, 0.0f, fire->width, fire->height }; // Região completa da textura
         
         Vector2 flamePosition = { position.x, position.y + 100 }; 
 
@@ -208,4 +241,17 @@ void DestroyEntity(Entity* ent) {
  	cpShapeFree(ent->shape);
  	cpBodyFree(ent->body);
  	free(ent);
+}
+
+
+
+void GainExperience(SpaceShip* player,int xp)
+{
+    player->experience += xp;
+
+    if(player->experience > player->nextLevelXp){
+        player->experience = player->experience -player->nextLevelXp;
+        player->level++;
+        player->nextLevelXp *= 1.2;
+    }
 }

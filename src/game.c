@@ -1,13 +1,9 @@
 #include "game.h"
-#include "chipmunk/chipmunk_types.h"
 #include "entity.h"
-#include "hud.h"
 #include "raylib.h"
-#include <assert.h>
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "chipmunk/chipmunk.h"
+#include <stdio.h>
 
 Game game;
 
@@ -21,6 +17,7 @@ cpBool BulletvsAsteroidBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userD
     bulletEntity->isAlive = 0;
     asteroidEntity->isAlive = 0;
     AddScore(&game.hud,100);
+    GainExperience(game.player,50);
 	return cpTrue;
 }
 
@@ -51,6 +48,7 @@ void InitGame()
  	game.space = cpSpaceNew();
  	game.player =  CreateSpaceShip(cpv(300,300));
 	game.hud =     CreateHud(&game.player->health);
+	game.pause = false;
  	cpVect gravity = cpv(0,0);
 	cpSpaceSetGravity(game.space, gravity);
 	
@@ -205,7 +203,7 @@ void DrawGame(void)
 			i--;
 			continue;
 		}
-		UpdateEntity(asteroid);
+		UpdateAsteroid(asteroid);
 		DrawEntity(asteroid);
 	}
 
