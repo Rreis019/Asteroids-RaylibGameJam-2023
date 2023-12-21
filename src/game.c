@@ -1,9 +1,12 @@
 #include "game.h"
 #include "chipmunk/chipmunk.h"
+#include "chipmunk/chipmunk_types.h"
+#include "controller.h"
 #include "entity.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 Game game;
 
@@ -184,7 +187,6 @@ void UpdateCollectionEntity(Entity** entities,int* nEnts,tpFunc updateEnt,tpFunc
 }
 
 #include "particle.h"
-Emitter em;
 void DrawGame(void)
 {
 	if(game.player->health == 0){RestartGame();}
@@ -194,6 +196,7 @@ void DrawGame(void)
 	SpawnAsteroids();
 
 	BeginMode2D(game.camera);
+	DrawParticles();
 	UpdateCollectionEntity(game.bullets,&game.nBullets,UpdateEntity,DrawEntity,DestroyEntity);
 	UpdateCollectionEntity(game.asteroids,&game.nAsteroids,UpdateAsteroid,DrawEntity,DestroyEntity);
 
@@ -201,8 +204,37 @@ void DrawGame(void)
 	DrawController(game.player);
 	DrawColliders(game.space);
 
+	cpVect v =  GetBackPosition(game.player);
+	DrawRectangle(v.x, v.y, 5, 5, RED);
+	if (IsKeyPressed(KEY_F))
+	{
+    float angle = cpBodyGetAngle(game.player->base.body);
+    Color red = RED;
+    red.a = 0.0;
+    float rotationRadians = angle + DEG2RAD * 90;
+
+    Vector2 forwardVector = { cos(rotationRadians), sin(rotationRadians) };
+    cpVect leftVector;
+    leftVector.x = -forwardVector.y; // Girar 90 graus no sentido anti-horário
+    leftVector.y = forwardVector.x;
+
+    leftVector = cpvnormalize(leftVector);
+
+    Emitter* e = AddEmitter(
+        (Vector2){ v.x, v.y },
+        (Vector2){ forwardVector.x * 500, forwardVector.y * 500 },
+        (Vector2){ 0, 0 },
+        (Vector2){ 0, 0 },
+        0.005, 1.0f, 1.0f, ORANGE, red, (Vector2){ 10, 10 }, (Vector2){ 1, 1 });
+
+    e->randomPositionRangeX = (Vector2){ leftVector.x * -15,leftVector.x*  15 };
+    e->randomPositionRangeY = (Vector2){ leftVector.y * -15, leftVector.y * 15 };
+
+    // e->gravity = 100;
+}
+
+
 	EndMode2D();
-	DrawParticles();
 
 	  float scroll = GetMouseWheelMove(); // Obtém o movimento do scroll do mouse
 
@@ -214,18 +246,6 @@ void DrawGame(void)
     if (cam->zoom > 1.0f) cam->zoom = 1.0f;
 
 
-    if (IsKeyPressed(KEY_F))
-    {
-    	Color red = RED;
-    	red.a = 0.0;
-    	Emitter* e = AddEmitter(
-    		(Vector2){SCREEN_WIDTH/2,SCREEN_HEIGHT/2},
-    		(Vector2){0,-2000},
-    		(Vector2){-200,200},
-    		(Vector2){0,0},
-    		 0.1,1.0,1.0f, ORANGE, red,(Vector2){20,20},(Vector2){105,105});
-    	//e->gravity = 100;
-    }
 
 
 }

@@ -27,6 +27,8 @@ Emitter* AddEmitter(Vector2 position,Vector2 velocity, Vector2 randVelRangeX, Ve
     emitter.creationTime = GetTime();
     emitter.sizeBegin = sizeBegin;
     emitter.sizeEnd = sizeEnd;
+    emitter.randomPositionRangeX = Vector2Zero();
+    emitter.randomPositionRangeY = Vector2Zero();
     emitter.active = true;
     if(nEmitters != MAX_EMITTERS){
     	emitters[nEmitters++] = emitter;
@@ -66,6 +68,8 @@ void UpdateEmitter(Emitter* emitter)
 			p.sizeEnd = emitter->sizeEnd;
 			p.lifespan  = emitter->particleLifespan;
 			p.gravity = emitter->gravity;
+			p.position.x += RandomFloat(emitter->randomPositionRangeX.x, emitter->randomPositionRangeX.y);
+			p.position.y += RandomFloat(emitter->randomPositionRangeY.x, emitter->randomPositionRangeY.y);
 			particles[nParticles++] = p;
 		}
 	}

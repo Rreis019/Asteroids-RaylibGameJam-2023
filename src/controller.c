@@ -1,4 +1,5 @@
 #include "game.h"
+#include "raylib.h"
 #include "controller.h"
 
 Controller* CreateController(cpVect position)
@@ -27,6 +28,20 @@ Controller* CreateController(cpVect position)
 	return c; 
 }
 
+cpVect GetBackPosition(Controller* c) {
+    Entity* ent = (Entity*)c;
+    cpVect frontPosition = cpBodyGetPosition(ent->body);
+
+    // Obter o ângulo atual da nave
+    cpFloat angle = cpBodyGetAngle(ent->body) - 90 * DEG2RAD;
+
+    // Adicionar um deslocamento para a parte traseira da nave
+    // Suponha que a nave está alinhada com o eixo X quando não está girando
+    cpVect backOffset = cpvmult(cpvforangle(angle), -ent->textWidth * 0.5f);
+
+    // Calcular e retornar a posição da parte traseira da nave
+    return cpvadd(frontPosition, backOffset);
+}
 
 void UpdateController(Controller* c)
 {

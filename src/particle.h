@@ -22,6 +22,8 @@ typedef struct
 	float particleLifespan; // Default lifespan for particles
 	Vector2 startVelocity; //Start velocity for particles
 
+	Vector2 randomPositionRangeX;
+	Vector2 randomPositionRangeY;
 	Vector2 randomVelocityRangeX;
 	Vector2 randomVelocityRangeY;
 	Vector2 sizeBegin,sizeEnd;

@@ -20,3 +20,4 @@ Controller* CreateController(cpVect position);
 void 	   UpdateController(Controller* c);
 void       DrawController(Controller* c);
 void GainExperience(Controller* player,int xp);
+cpVect GetBackPosition(Controller* c);
