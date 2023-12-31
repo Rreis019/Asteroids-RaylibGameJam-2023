@@ -1,6 +1,7 @@
 #pragma once
 #include "chipmunk/chipmunk.h"
 #include "entity.h"
+#include "particle.h"
 
 #define INVICIBLE_TIME_SECONDS 0.3
 
@@ -14,6 +15,10 @@ typedef struct
 	int level;
 	float experience;
 	float  nextLevelXp;
+
+	float firerate;
+
+	Emitter* em;
 }Controller;
 
 Controller* CreateController(cpVect position);

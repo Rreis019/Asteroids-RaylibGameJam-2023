@@ -3,15 +3,17 @@
 #include "chipmunk/chipmunk.h"
 #include <stdbool.h>
 
-#define FIRE_RATE_SECONDS 0.1
 #define BULLET_SPEED 1000
-#define ASTEROID_SPEED 600
+#define ASTEROID_SPEED 200
+#define INVICIBLE_TIME_SECONDS 0.3
 
 enum CollisionType
 {
 	PLAYER_COLLISION_TYPE,
 	ASTEROID_COLISSION_TYPE = 1,
-	PLAYER_BULLET_COLISSION_TYPE
+	PLAYER_BULLET_COLISSION_TYPE,
+	ENEMY_COLISSION_TYPE,
+	ENEMY_BULLET_COLISSION_TYPE
 };
 
 typedef struct
@@ -24,16 +26,12 @@ typedef struct
 	cpShape* shape;
 }Asteroid,Bullet,Entity;
 
-
-
-
-#define INVICIBLE_TIME_SECONDS 0.3
-
-
-
+Entity CreateEntity(cpVect position,int imageID,float scale);
 Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle);
 Asteroid* CreateAsteroid();
+cpVect GetRandomPosition(int textWidth,int textHeight);
 
+typedef void (*tpUpdateEnt)(Entity*);
 
 void UpdateAsteroid(Entity* b);
 void UpdateEntity(Entity* b);

@@ -8,6 +8,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+Entity CreateEntity(cpVect position,int image,float scale)
+{
+    Entity e;
+    e.texture = &game.textures[image];
+    e.textWidth = e.texture->width * scale;
+    e.textHeight = e.texture->height * scale;
+    e.isAlive = 1;
+
+    e.body = cpSpaceAddBody(game.space,cpBodyNew(1.0, cpMomentForBox(1.0f,e.textWidth,e.textHeight)));
+    e.shape = cpSpaceAddShape(game.space,cpBoxShapeNew(e.body,e.textWidth,e.textHeight,0));
+    cpBodySetPosition(e.body, position);
+    return e;
+}
+
 Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle)
 {
 	Bullet* bullet = malloc(sizeof(Bullet));
@@ -35,6 +49,33 @@ double randomInRange(double min, double max) {
 }
 
 
+cpVect GetRandomPosition(int textWidth,int textHeight)
+{
+    int side = rand() % 4;
+    cpVect randomPosition;
+    switch (side) {
+        case 0: // TOP-SCREEN
+            randomPosition.x = game.camera.target.x - rand() % SCREEN_WIDTH;
+            randomPosition.y = game.camera.target.y - (SCREEN_HEIGHT / (2 * game.camera.zoom)) - textHeight;
+            break;
+        case 1: // TOP-LEFT-SCREEN
+            randomPosition.x = game.camera.target.x - (SCREEN_WIDTH / (2 * game.camera.zoom)) - textWidth;
+            randomPosition.y = game.camera.target.y -  rand() % SCREEN_HEIGHT;
+            break;
+        case 2: // TOP-RIGHT-SCREEN
+            randomPosition.x = game.camera.target.x + (SCREEN_WIDTH / (2 * game.camera.zoom)) + textWidth;
+            randomPosition.y = game.camera.target.y -  rand() % SCREEN_HEIGHT;
+            break;
+        case 3: // BOTTOM-SCREEN
+            randomPosition.x = game.camera.target.x - rand() % SCREEN_WIDTH;
+            randomPosition.y = game.camera.target.y + (SCREEN_HEIGHT / (2 * game.camera.zoom)) + textHeight;
+            break;
+    }
+
+    return randomPosition;
+}
+
+
 Asteroid* CreateAsteroid()
 {
     Asteroid* asteroid = (Asteroid*)malloc(sizeof(Asteroid));
@@ -57,27 +98,19 @@ Asteroid* CreateAsteroid()
     cpVect asteroidPosition = cpv(0, 0);
     int side = rand() % 4;
     cpVect asteroidVelocity;
-    Camera2D* cam = &game.camera;
 
+    asteroidPosition = GetRandomPosition(asteroid->textWidth,asteroid->textHeight);
     switch (side) {
         case 0: // TOP-SCREEN
-            asteroidPosition.x =  cam->target.x - rand() % SCREEN_WIDTH;
-            asteroidPosition.y = cam->target.y - (SCREEN_HEIGHT / (2 * cam->zoom)) - RADIUS;
             asteroidVelocity = cpv(0, ASTEROID_SPEED); // Mover para baixo (direção positiva y)
             break;
         case 1: // TOP-LEFT-SCREEN
-            asteroidPosition.x = cam->target.x - (SCREEN_WIDTH / (2 * cam->zoom)) - RADIUS;
-            asteroidPosition.y = cam->target.y -  rand() % SCREEN_HEIGHT;
             asteroidVelocity = cpv(ASTEROID_SPEED, ASTEROID_SPEED); // Mover para a direita e para baixo
             break;
         case 2: // TOP-RIGHT-SCREEN
-            asteroidPosition.x = cam->target.x + (SCREEN_WIDTH / (2 * cam->zoom)) + RADIUS;
-            asteroidPosition.y = cam->target.y -  rand() % SCREEN_HEIGHT;
             asteroidVelocity = cpv(-ASTEROID_SPEED, ASTEROID_SPEED); // Mover para a esquerda e para baixo
             break;
         case 3: // BOTTOM-SCREEN
-            asteroidPosition.x = cam->target.x - rand() % SCREEN_WIDTH;
-            asteroidPosition.y = cam->target.y + (SCREEN_HEIGHT / (2 * cam->zoom)) + RADIUS;
             asteroidVelocity = cpv(0, -ASTEROID_SPEED); // Mover para cima (direção negativa y)
             break;
     }
@@ -159,6 +192,7 @@ void DrawEntity(Entity* ent)
 
 void DestroyEntity(Entity* ent) {
 	//assert(ent->shape != NULL && "NULLO");
+    printf("Entity destroy\n");
     cpSpaceRemoveShape(game.space, ent->shape);
  	cpSpaceRemoveBody(game.space, ent->body);
  	cpShapeFree(ent->shape);

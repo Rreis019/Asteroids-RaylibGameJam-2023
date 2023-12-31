@@ -1,12 +1,14 @@
 #include "game.h"
+#include "Card.h"
 #include "chipmunk/chipmunk.h"
-#include "chipmunk/chipmunk_types.h"
 #include "controller.h"
+#include "enemy.h"
 #include "entity.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "particle.h"
 
 Game game;
 
@@ -32,14 +34,34 @@ cpBool PlayerVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
     cpCollisionType type = cpShapeGetCollisionType(b); 
 
     if(type == PLAYER_BULLET_COLISSION_TYPE){return cpTrue;}
-
 	Controller* player = (Controller*)cpShapeGetUserData(a);
 	
-	printf("hurt\n");
+	//printf("hurt\n");
 	if(player->hurtAnimation){return cpTrue;}
 	player->lastTimeHurt = GetTime();
 	player->hurtAnimation = true;
 	player->health--;
+	
+	return cpTrue;
+}
+
+cpBool EnemyVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
+{
+	cpShape *a, *b;
+    cpArbiterGetShapes(arb, &a, &b);
+    cpCollisionType type = cpShapeGetCollisionType(b); 
+
+	Enemy* enemy = (Enemy*)cpShapeGetUserData(a);
+
+    if(type == PLAYER_BULLET_COLISSION_TYPE){
+    	Bullet* bullet = (Bullet*)cpShapeGetUserData(b);
+    	bullet->isAlive = false;
+
+    	enemy->health--;
+    	if(enemy->health <= 0){
+    		enemy->base.isAlive = 0;
+    	}
+    }
 	
 	return cpTrue;
 }
@@ -61,6 +83,9 @@ void InitGame()
 	cpCollisionHandler* handlerPlayer =  cpSpaceAddWildcardHandler(game.space,PLAYER_COLLISION_TYPE);
 	handlerPlayer->beginFunc = PlayerVsAnyBegin;
 
+	cpCollisionHandler* handlerEnemy =  cpSpaceAddWildcardHandler(game.space,ENEMY_COLISSION_TYPE);
+	handlerEnemy->beginFunc = EnemyVsAnyBegin;
+	
 	Camera2D camera = { 0 };
 
 	cpVect position = cpBodyGetPosition(game.player->base.body);
@@ -70,6 +95,7 @@ void InitGame()
 	camera.rotation = 0.0f;
 	camera.zoom = 1.0f;
 	game.camera = camera;
+	game.showCardMenu = false;
 }
 
 void DestroyGame()
@@ -84,7 +110,13 @@ void AddAsteroid(Asteroid* a){
     if(game.nAsteroids == MAX_ASTEROIDS) {return;}
     game.asteroids[game.nAsteroids++] = a;
 }
-
+void AddEnemy(Enemy* e){
+	if(game.nEnemys == MAX_ENEMYS) {
+		DestroyEntity((Entity*)e);
+		return;
+	}
+	game.enemys[game.nEnemys++] = e;
+}
 void AddBullet(Bullet* b){
 	if(MAX_BULLETS == game.nBullets){ return;}
 	game.bullets[game.nBullets++] = b;
@@ -92,16 +124,49 @@ void AddBullet(Bullet* b){
 
 void LoadResources()
 {
-	game.textures[IMG_SPACESHIP] = LoadTexture("resources/PlayerShip/playerShip1_blue.png");
-	game.textures[IMG_BULLET] = LoadTexture("resources/bulletBlue.png");
-	game.textures[IMG_SPACE_BACKGROUND] = LoadTexture("resources/black.png");
-	game.textures[IMG_SPACE_LIFE] = LoadTexture("resources/playerLife3_blue.png");
-	game.textures[IMG_SPACE_SHIP_THURST] = LoadTexture("resources/thurst.png");
-	for (int i = 0; i < 4; ++i)
-	{
-		game.textures[IMG_METEOR_BROWN_BIG + i] = LoadTexture(TextFormat("resources/Meteors/meteorBrown_big%d.png",i+1));
+	#define RESOURCES_PATH "resources/"
+	#define AUDIO_PATH RESOURCES_PATH "Audio/"
+	game.textures[IMG_SPACESHIP] = LoadTexture(RESOURCES_PATH "PlayerShip/playerShip1_blue.png");
+	game.textures[IMG_BULLET] = LoadTexture(RESOURCES_PATH "bulletBlue.png");
+	game.textures[IMG_SPACE_BACKGROUND] = LoadTexture(RESOURCES_PATH "black.png");
+	game.textures[IMG_SPACE_LIFE] = LoadTexture(RESOURCES_PATH "playerLife3_blue.png");
+	game.textures[IMG_SPACE_SHIP_THURST] = LoadTexture(RESOURCES_PATH "thurst.png");
+	
+	for (int i = 0; i < 5; ++i){
+		game.textures[IMG_ENEMY_BLACK1 + i] = LoadTexture(TextFormat(RESOURCES_PATH "Enemies/enemyBlack%d.png",i+1));
 	}
 
+	for (int i = 0; i < 4; ++i){
+		game.textures[IMG_METEOR_BROWN_BIG + i] = LoadTexture(TextFormat(RESOURCES_PATH "Meteors/meteorBrown_big%d.png",i+1));
+	}
+
+	game.textures[IMG_BLACK_PANEL] = LoadTexture(RESOURCES_PATH "blank_panel.png");
+
+	//LoadCardIcons
+	game.textures[IMG_CARD_BIGGER_BULLET] = LoadTexture(RESOURCES_PATH "CardIcons/BiggerBullets.png");
+	game.textures[IMG_CARD_BULLET_PER_SHOOT] = LoadTexture(RESOURCES_PATH "CardIcons/BulletHell.png");
+	game.textures[IMG_CARD_FIRERATE] = LoadTexture(RESOURCES_PATH "CardIcons/FireRate.png");
+	game.textures[IMG_CARD_INVICIBLETIME] = LoadTexture(RESOURCES_PATH "CardIcons/InvicibleTime.png");
+	game.textures[IMG_CARD_LASERBEAM] =  LoadTexture(RESOURCES_PATH "CardIcons/LaserBeam.png");
+	game.textures[IMG_CARD_PIERCING_SHOOT] = LoadTexture(RESOURCES_PATH "CardIcons/PiercingBullet.png");
+	game.textures[IMG_CARD_REGEN] = LoadTexture(RESOURCES_PATH "CardIcons/Regen.png");
+	game.textures[IMG_CARD_ROUNDBULLET] = LoadTexture(RESOURCES_PATH "CardIcons/RoundBullets.png");
+	game.textures[IMG_CARD_SPEED] = LoadTexture(RESOURCES_PATH "CardIcons/Wing.png");
+	game.textures[IMG_CARD_XPBOOST] = LoadTexture(RESOURCES_PATH "CardIcons/XPBoost.png");
+
+	//LoadFonts
+
+	InitAudioDevice();
+	game.sfx[AUDIO_LASER] = LoadSound(AUDIO_PATH "laserSmall_002.wav");
+	game.sfx[AUDIO_THRUST] = LoadSound(AUDIO_PATH "thrusterFire_003.wav");
+
+	for (int i = 0; i < MAX_SFX; ++i)
+	{
+		SetSoundVolume(game.sfx[i], 0.05);
+	}
+
+	game.fonts[FONT_UBUNTU_BOLD] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
+	game.fonts[FONT_UBUNTU_REGULAR] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
 }
 
 void DrawBackground()
@@ -132,10 +197,17 @@ void SpawnAsteroids()
 	{
 		if(GetTime() > lastTimeSpawn){
 			AddAsteroid(CreateAsteroid());
-			lastTimeSpawn = GetTime() + 0.2f;
+			lastTimeSpawn = GetTime() + 0.5f;
 		}
 	}
 }
+
+void SpawnEnemy(Enemy* e)
+{
+   AddEnemy(e);
+
+}
+
 
 void IterateShapes(cpBody* body, cpShape *shape, void *data) {
     cpBB bb = cpShapeGetBB(shape);
@@ -160,8 +232,10 @@ void RestartGame(void)
 	cpBodySetPosition(game.player->base.body, cpv((float)SCREEN_WIDTH/2,(float)SCREEN_HEIGHT/2));
 	for (int i = 0; i < game.nAsteroids; ++i){DestroyEntity(game.asteroids[i]);}
 	for (int i = 0; i < game.nBullets; ++i){DestroyEntity(game.bullets[i]);}
+	for (int i = 0; i < game.nEnemys; ++i){DestroyEntity((Entity*)game.enemys[i]);}
 	game.nAsteroids = 0;
 	game.nBullets = 0;
+	game.nEnemys = 0;
 }
 
 
@@ -181,17 +255,30 @@ void UpdateCollectionEntity(Entity** entities,int* nEnts,tpFunc updateEnt,tpFunc
 			index--;
 			continue;
 		}
-		updateEnt(ent);
+		if(!game.pause){updateEnt(ent);}
 		drawEnt(ent);
 	}
 }
 
-#include "particle.h"
+
+
+void onPlayerLevelUP()
+{
+
+	game.pause = true;
+	game.showCardMenu = true;
+	game.currentCards[0] = CreateCard();
+	game.currentCards[1] = CreateCard();
+}
+
+
 void DrawGame(void)
 {
 	if(game.player->health == 0){RestartGame();}
 	Camera2D * cam = &game.camera;
-	cpSpaceStep(game.space, GetFrameTime());
+
+	if(!game.pause)
+		cpSpaceStep(game.space, GetFrameTime());
 	DrawBackground();
 	SpawnAsteroids();
 
@@ -199,58 +286,47 @@ void DrawGame(void)
 	DrawParticles();
 	UpdateCollectionEntity(game.bullets,&game.nBullets,UpdateEntity,DrawEntity,DestroyEntity);
 	UpdateCollectionEntity(game.asteroids,&game.nAsteroids,UpdateAsteroid,DrawEntity,DestroyEntity);
+	UpdateCollectionEntity((Entity**)game.enemys,&game.nEnemys,(tpUpdateEnt)UpdateEnemy,DrawEntity,DestroyEntity);
+	
 
-	UpdateController(game.player);
+	if(!game.pause)
+		UpdateController(game.player);
+
+
+
 	DrawController(game.player);
 	DrawColliders(game.space);
 
-	cpVect v =  GetBackPosition(game.player);
-	DrawRectangle(v.x, v.y, 5, 5, RED);
-	if (IsKeyPressed(KEY_F))
-	{
-    float angle = cpBodyGetAngle(game.player->base.body);
-    Color red = RED;
-    red.a = 0.0;
-    float rotationRadians = angle + DEG2RAD * 90;
-
-    Vector2 forwardVector = { cos(rotationRadians), sin(rotationRadians) };
-    cpVect leftVector;
-    leftVector.x = -forwardVector.y; // Girar 90 graus no sentido anti-horário
-    leftVector.y = forwardVector.x;
-
-    leftVector = cpvnormalize(leftVector);
-
-    Emitter* e = AddEmitter(
-        (Vector2){ v.x, v.y },
-        (Vector2){ forwardVector.x * 500, forwardVector.y * 500 },
-        (Vector2){ 0, 0 },
-        (Vector2){ 0, 0 },
-        0.005, 1.0f, 1.0f, ORANGE, red, (Vector2){ 10, 10 }, (Vector2){ 1, 1 });
-
-    e->randomPositionRangeX = (Vector2){ leftVector.x * -15,leftVector.x*  15 };
-    e->randomPositionRangeY = (Vector2){ leftVector.y * -15, leftVector.y * 15 };
-
-    // e->gravity = 100;
-}
-
+	if(IsKeyPressed(KEY_F)){
+		SpawnEnemy(CreateEnemy(0));
+	}
 
 	EndMode2D();
-
-	  float scroll = GetMouseWheelMove(); // Obtém o movimento do scroll do mouse
-
+  float scroll = GetMouseWheelMove(); // Obtém o movimento do scroll do mouse
     // Ajusta o zoom com base no movimento do scroll
     cam->zoom += scroll;
 
     // Limita o zoom a um valor mínimo e máximo (ajuste conforme necessário)
     if (cam->zoom < 0.7f) cam->zoom = 0.7f;
     if (cam->zoom > 1.0f) cam->zoom = 1.0f;
-
-
-
-
 }
 
+#include "raygui.h"
 void DrawGameGui(void)
 {
 	DrawHud(&game.hud);
+
+	if(IsKeyPressed(KEY_ESCAPE)){
+		game.pause = !game.pause;
+	}
+
+	if(game.showCardMenu)
+	{
+		Vector2 textSize = MeasureTextEx(GetFontDefault(), "Choose a Card", 64, 6);
+		Vector2 position = { (float)GetScreenWidth()/2 - textSize.x/2 , (float)GetScreenHeight() / 4};
+		DrawText("Choose a Card",position.x,position.y, 64, WHITE);
+		DrawCard(&game.currentCards[0],(Vector2){GetScreenWidth()/2 - (CARD_WIDTH+10),position.y + textSize.y + 10});
+		DrawCard(&game.currentCards[1],(Vector2){GetScreenWidth()/2 + 10,position.y + textSize.y + 10});
+	}
+
 }

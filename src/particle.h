@@ -1,8 +1,9 @@
+#pragma once
 #include <stdbool.h>
 #include "raylib.h"
 
-#define MAX_PARTICLES 500
-#define MAX_EMITTERS 50
+#define MAX_PARTICLES 2000
+#define MAX_EMITTERS 100
 
 typedef struct 
 {

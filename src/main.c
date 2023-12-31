@@ -59,7 +59,6 @@ static void UpdateDrawFrame();      // Update and Draw one frame
 // Program main entry point
 //------------------------------------------------------------------------------------
 
-Texture m;
 int main(void)
 {
     srand(time(NULL));
@@ -68,6 +67,7 @@ int main(void)
 #endif
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib gamejam template");
+    SetExitKey(KEY_NULL);
     InitGame();
     // Render texture to draw full screen, enables screen scaling
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
