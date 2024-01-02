@@ -5,18 +5,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_CARDS 10
+//Effects
+void EmptyEffect(){}
+void BiggerBullet(){game.player->bulletSizeModifier += 0.5;}
+void BulletHell(){game.player->bulletsPerShoot++;}
+void FireRateBoost(){game.player->fireRateModifier += 0.50;}
+void InvincibleTime(){game.player->fireRateModifier += 0.25;}
+void PiercingBullet(){game.player->piercingBulletsCount++;}
+void IncSpeed(){ game.player->speedModifier += 0.25;}
+void IncXpBoost() {game.player->xpBoostModifier += 1.00;}
+void IncMaxHealth(){
+	game.player->maxHealth++;
+	game.player->health++;
+}
+void SetWASD(){ game.player->wasd = true;}
+void RegenHealth(){ game.player->health = game.player->maxHealth;}
+
+#define MAX_CARDS 12
 Card cards[MAX_CARDS] = {
-    (Card){.name = "Bigger Bullets", .description = "Increases bullet size by 10%", &game.textures[IMG_CARD_BIGGER_BULLET]},
-    (Card){.name = "Bullet Hell", .description = "Increases the number of bullets per shot", &game.textures[IMG_CARD_BULLET_PER_SHOOT]},
-    (Card){.name = "FireRate Boost", .description = "Boosts the rate of fire", &game.textures[IMG_CARD_FIRERATE]},
-    (Card){.name = "Invincible Time", .description = "Extends invincibility by 25% duration after being hit", &game.textures[IMG_CARD_INVICIBLETIME]},
-    (Card){.name = "Laser Beam", .description = "Upgrades your weapon to a laser", &game.textures[IMG_CARD_LASERBEAM]},
-    (Card){.name = "Piercing Bullets", .description = "Allows bullets to pass through +1 enemy", &game.textures[IMG_CARD_PIERCING_SHOOT]},
-    (Card){.name = "Regen", .description = "Regenerates +5% of your maximum health", &game.textures[IMG_CARD_REGEN]},
-    (Card){.name = "Round Bullets", .description = "Fires bullets that orbit the spaceship", &game.textures[IMG_CARD_ROUNDBULLET]},
-    (Card){.name = "Swift Wing", .description = "Enhances aircraft speed", &game.textures[IMG_CARD_SPEED]},
-    (Card){.name = "XP Boost", .description = "Increases XP gained per kill by 10%", &game.textures[IMG_CARD_XPBOOST]},
+    (Card){.name = "Bigger Bullets", .description = "Increases bullet size by 50%", &game.textures[IMG_CARD_BIGGER_BULLET],.effect = BiggerBullet},
+    (Card){.name = "Bullet Hell", .description = "Increases the number of bullets per shot", &game.textures[IMG_CARD_BULLET_PER_SHOOT],.effect = BulletHell},
+    (Card){.name = "FireRate Boost", .description = "Boosts the rate of fire by 50%", &game.textures[IMG_CARD_FIRERATE],.effect = FireRateBoost},
+    (Card){.name = "Invincible Time", .description = "Extends invincibility by 25% duration after being hit", &game.textures[IMG_CARD_INVICIBLETIME],.effect = InvincibleTime},
+    (Card){.name = "Laser Beam", .description = "Upgrades your weapon to a laser", &game.textures[IMG_CARD_LASERBEAM],.effect = EmptyEffect},
+    (Card){.name = "Piercing Bullets", .description = "Allows bullets to pass through +1 enemy", &game.textures[IMG_CARD_PIERCING_SHOOT],.effect = PiercingBullet},
+    (Card){.name = "Regen", .description = "Fully regenerates spaceship health", &game.textures[IMG_CARD_REGEN],.effect = RegenHealth},
+    (Card){.name = "Round Bullets", .description = "Fires bullets that orbit the spaceship", &game.textures[IMG_CARD_ROUNDBULLET],.effect = EmptyEffect},
+    (Card){.name = "Swift Wing", .description = "Enhances aircraft speed by 25%", &game.textures[IMG_CARD_SPEED],.effect = IncSpeed},
+    (Card){.name = "XP Boost", .description = "Increases XP gained by 100%", &game.textures[IMG_CARD_XPBOOST],.effect = IncXpBoost},
+ 	(Card){.name = "WASD", .description = "Spaceship movement will be controlled using the WASD keys.", &game.textures[IMG_CARD_WASD],.effect = SetWASD},
+ 	(Card){.name = "More Health", .description = "Increases spaceship maximum health.", &game.textures[IMG_CARD_MORE_HEALTH],.effect = IncMaxHealth}
 };
 
 
@@ -34,7 +52,7 @@ void DrawCard(Card* c,Vector2 position)
 	if(CheckCollisionPointRec(GetMousePosition(),(Rectangle){startPosition.x,startPosition.y,CARD_WIDTH,CARD_HEIGHT})){
 		borderColor = GREEN;
 		if(IsMouseButtonPressed(0)){
-			//c->effect();
+			c->effect();
 			game.pause = false;
 			game.showCardMenu = false;
 		}
@@ -72,3 +90,6 @@ void DrawCard(Card* c,Vector2 position)
 		16, 0,true,WHITE
 	);
 }
+
+
+

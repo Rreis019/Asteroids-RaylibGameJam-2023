@@ -1,14 +1,19 @@
 #include "game.h"
 #include "Card.h"
 #include "chipmunk/chipmunk.h"
+#include "chipmunk/chipmunk_types.h"
 #include "controller.h"
 #include "enemy.h"
 #include "entity.h"
+#include "hud.h"
 #include "raylib.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "particle.h"
+#include "raymath.h"
+#include "screen.h"
+#include "wave_spawner.h"
 
 Game game;
 
@@ -19,10 +24,25 @@ cpBool BulletvsAsteroidBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userD
 	Bullet* bulletEntity = (Bullet*)cpShapeGetUserData(a);
     Asteroid* asteroidEntity = (Asteroid*)cpShapeGetUserData(b);
 	
-    bulletEntity->isAlive = 0;
+    bulletEntity->health--;
+    if(bulletEntity->health <= 0){
+    	bulletEntity->isAlive = 0;
+    }
     asteroidEntity->isAlive = 0;
     AddScore(&game.hud,100);
-    GainExperience(game.player,50);
+    GainExperience(game.player,10);
+
+    cpVect pos = cpBodyGetPosition(asteroidEntity->body);
+	Vector2 randVel = {-100,100};
+	Vector2 sizeBegin = {10,10};
+	Emitter * e= AddEmitter((Vector2){pos.x,pos.y},Vector2Zero(),randVel,randVel,0.1,2,0.1,BROWN,BROWN,sizeBegin,Vector2Zero());
+	e->particlesPerEmit = 10;
+
+	Vector2 up = {0,-100};
+	char text[32];
+	sprintf_s(text,32,"%d",100);
+	AddParticleText(text,(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
+
 	return cpTrue;
 }
 
@@ -55,11 +75,25 @@ cpBool EnemyVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 
     if(type == PLAYER_BULLET_COLISSION_TYPE){
     	Bullet* bullet = (Bullet*)cpShapeGetUserData(b);
-    	bullet->isAlive = false;
-
+      	bullet->health--;
+    	if(bullet->health <= 0){bullet->isAlive = 0;}
+    	
     	enemy->health--;
     	if(enemy->health <= 0){
     		enemy->base.isAlive = 0;
+    		GainExperience(game.player,enemy->expGiven);
+			cpVect pos = cpBodyGetPosition(enemy->base.body);
+			Vector2 randVel = {-100,100};
+			Vector2 sizeBegin = {10,10};
+			Emitter * e= AddEmitter((Vector2){pos.x,pos.y},Vector2Zero(),randVel,randVel,0.1,2,0.1,ORANGE,YELLOW,sizeBegin,Vector2Zero());
+			e->particlesPerEmit = 10;
+		 	AddScore(&game.hud,enemy->score);
+
+	 		Vector2 up = {0,-100};
+	 		char text[32];
+	 		sprintf_s(text,32,"%d",enemy->score);
+			AddParticleText(text,(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
+
     	}
     }
 	
@@ -86,16 +120,18 @@ void InitGame()
 	cpCollisionHandler* handlerEnemy =  cpSpaceAddWildcardHandler(game.space,ENEMY_COLISSION_TYPE);
 	handlerEnemy->beginFunc = EnemyVsAnyBegin;
 	
+	InitEnemyTypes();
+	InitWaveSpawner(&game.spawner);
 	Camera2D camera = { 0 };
-
 	cpVect position = cpBodyGetPosition(game.player->base.body);
-
 	camera.target = (Vector2){ position.x, position.y };
 	camera.offset = (Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
 	camera.rotation = 0.0f;
-	camera.zoom = 1.0f;
+	camera.zoom = 0.7f;
 	game.camera = camera;
 	game.showCardMenu = false;
+	game.gameOver = false;
+
 }
 
 void DestroyGame()
@@ -107,7 +143,11 @@ void DestroyGame()
 }
 
 void AddAsteroid(Asteroid* a){
-    if(game.nAsteroids == MAX_ASTEROIDS) {return;}
+    if(game.nAsteroids == MAX_ASTEROIDS) {
+    	DestroyEntity(a);
+    	printf("max\n");
+    	return;
+    }
     game.asteroids[game.nAsteroids++] = a;
 }
 void AddEnemy(Enemy* e){
@@ -127,14 +167,27 @@ void LoadResources()
 	#define RESOURCES_PATH "resources/"
 	#define AUDIO_PATH RESOURCES_PATH "Audio/"
 	game.textures[IMG_SPACESHIP] = LoadTexture(RESOURCES_PATH "PlayerShip/playerShip1_blue.png");
-	game.textures[IMG_BULLET] = LoadTexture(RESOURCES_PATH "bulletBlue.png");
 	game.textures[IMG_SPACE_BACKGROUND] = LoadTexture(RESOURCES_PATH "black.png");
 	game.textures[IMG_SPACE_LIFE] = LoadTexture(RESOURCES_PATH "playerLife3_blue.png");
-	game.textures[IMG_SPACE_SHIP_THURST] = LoadTexture(RESOURCES_PATH "thurst.png");
-	
+	game.textures[IMG_CURSOR] = LoadTexture(RESOURCES_PATH "cursor.png");
+
 	for (int i = 0; i < 5; ++i){
 		game.textures[IMG_ENEMY_BLACK1 + i] = LoadTexture(TextFormat(RESOURCES_PATH "Enemies/enemyBlack%d.png",i+1));
 	}
+
+	for (int i = 0; i < 5; ++i){
+		game.textures[IMG_ENEMY_BLUE1 + i] = LoadTexture(TextFormat(RESOURCES_PATH "Enemies/enemyBlue%d.png",i+1));
+	}
+
+	for (int i = 0; i < 5; ++i){
+		game.textures[IMG_ENEMY_GREEN1 + i] = LoadTexture(TextFormat(RESOURCES_PATH "Enemies/enemyGreen%d.png",i+1));
+	}
+
+		for (int i = 0; i < 5; ++i){
+		game.textures[IMG_ENEMY_ORANGE1 + i] = LoadTexture(TextFormat(RESOURCES_PATH "Enemies/enemyRed%d.png",i+1));
+	}
+
+
 
 	for (int i = 0; i < 4; ++i){
 		game.textures[IMG_METEOR_BROWN_BIG + i] = LoadTexture(TextFormat(RESOURCES_PATH "Meteors/meteorBrown_big%d.png",i+1));
@@ -153,9 +206,27 @@ void LoadResources()
 	game.textures[IMG_CARD_ROUNDBULLET] = LoadTexture(RESOURCES_PATH "CardIcons/RoundBullets.png");
 	game.textures[IMG_CARD_SPEED] = LoadTexture(RESOURCES_PATH "CardIcons/Wing.png");
 	game.textures[IMG_CARD_XPBOOST] = LoadTexture(RESOURCES_PATH "CardIcons/XPBoost.png");
+	game.textures[IMG_CARD_MORE_HEALTH] = LoadTexture(RESOURCES_PATH "CardIcons/MoreHealth.png");
+	game.textures[IMG_CARD_WASD] = LoadTexture(RESOURCES_PATH "CardIcons/WASD.png");
+
+	//Load Bullets
+	#define BULLETS_PATH RESOURCES_PATH "Bullets/"
+	game.textures[IMG_BULLET_BLUE] = LoadTexture(BULLETS_PATH "bulletBlue.png");
+	game.textures[IMG_BULLET_GREEN] = LoadTexture(BULLETS_PATH "bulletGreen.png");
+	game.textures[IMG_BULLET_YELLOW] = LoadTexture(BULLETS_PATH "bulletYellow.png");
+	game.textures[IMG_BULLET_RED] = LoadTexture(BULLETS_PATH "bulletRed.png");
+
+	game.textures[IMG_BULLET_ORB_RED] = LoadTexture(BULLETS_PATH "orbBlue.png");
+	game.textures[IMG_BULLET_ORB_GREEN] = LoadTexture(BULLETS_PATH "orbGreen.png");
+	game.textures[IMG_BULLET_ORB_BLUE] = LoadTexture(BULLETS_PATH "orbRed.png");
+	game.textures[IMG_BULLET_ORB_YELLOW] = LoadTexture(BULLETS_PATH "orbYellow.png");
 
 	//LoadFonts
+	game.fonts[FONT_UBUNTU_BOLD] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
+	game.fonts[FONT_UBUNTU_REGULAR] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
+	game.fonts[FONT_FASTUP] = LoadFont(RESOURCES_PATH "Fonts/04B_19__.TTF");
 
+	//LoadAudio
 	InitAudioDevice();
 	game.sfx[AUDIO_LASER] = LoadSound(AUDIO_PATH "laserSmall_002.wav");
 	game.sfx[AUDIO_THRUST] = LoadSound(AUDIO_PATH "thrusterFire_003.wav");
@@ -165,8 +236,6 @@ void LoadResources()
 		SetSoundVolume(game.sfx[i], 0.05);
 	}
 
-	game.fonts[FONT_UBUNTU_BOLD] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
-	game.fonts[FONT_UBUNTU_REGULAR] = LoadFont(RESOURCES_PATH "Fonts/ubuntu.bold.ttf");
 }
 
 void DrawBackground()
@@ -202,11 +271,7 @@ void SpawnAsteroids()
 	}
 }
 
-void SpawnEnemy(Enemy* e)
-{
-   AddEnemy(e);
 
-}
 
 
 void IterateShapes(cpBody* body, cpShape *shape, void *data) {
@@ -227,7 +292,8 @@ void DrawColliders(cpSpace *space) {cpSpaceEachBody(space, IterateBodies, NULL);
 
 void RestartGame(void)
 {
-	game.player->health = 3;
+	InitAtributes(game.player);
+	InitWaveSpawner(&game.spawner);
 	game.hud.realScore = game.hud.displayScore = 0;
 	cpBodySetPosition(game.player->base.body, cpv((float)SCREEN_WIDTH/2,(float)SCREEN_HEIGHT/2));
 	for (int i = 0; i < game.nAsteroids; ++i){DestroyEntity(game.asteroids[i]);}
@@ -236,10 +302,11 @@ void RestartGame(void)
 	game.nAsteroids = 0;
 	game.nBullets = 0;
 	game.nEnemys = 0;
+	game.showCardMenu = game.gameOver = game.pause = false;
+
 }
 
 
-typedef void (*tpFunc)(Entity* ent);
 void UpdateCollectionEntity(Entity** entities,int* nEnts,tpFunc updateEnt,tpFunc drawEnt,tpFunc destroyEnt)
 {
 	for (int index = 0; index < *nEnts; ++index)
@@ -264,7 +331,6 @@ void UpdateCollectionEntity(Entity** entities,int* nEnts,tpFunc updateEnt,tpFunc
 
 void onPlayerLevelUP()
 {
-
 	game.pause = true;
 	game.showCardMenu = true;
 	game.currentCards[0] = CreateCard();
@@ -274,41 +340,36 @@ void onPlayerLevelUP()
 
 void DrawGame(void)
 {
-	if(game.player->health == 0){RestartGame();}
-	Camera2D * cam = &game.camera;
+	if(game.player->health == 0){
+		game.gameOver = true;
+		game.pause = true;
+	}
 
 	if(!game.pause)
 		cpSpaceStep(game.space, GetFrameTime());
 	DrawBackground();
 	SpawnAsteroids();
 
+	UpdateWave(&game.spawner);
 	BeginMode2D(game.camera);
 	DrawParticles();
 	UpdateCollectionEntity(game.bullets,&game.nBullets,UpdateEntity,DrawEntity,DestroyEntity);
 	UpdateCollectionEntity(game.asteroids,&game.nAsteroids,UpdateAsteroid,DrawEntity,DestroyEntity);
-	UpdateCollectionEntity((Entity**)game.enemys,&game.nEnemys,(tpUpdateEnt)UpdateEnemy,DrawEntity,DestroyEntity);
-	
+	UpdateCollectionEntity((Entity**)game.enemys,&game.nEnemys,(tpUpdateEnt)UpdateEnemy,(tpFunc)DrawEnemy,DestroyEntity);
 
 	if(!game.pause)
 		UpdateController(game.player);
 
-
-
 	DrawController(game.player);
-	DrawColliders(game.space);
+	//DrawColliders(game.space);
 
 	if(IsKeyPressed(KEY_F)){
-		SpawnEnemy(CreateEnemy(0));
+		cpVect pos = cpBodyGetPosition(game.player->base.body);
+		Vector2 up = {0,-140};
+		AddParticleText("1000",(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
 	}
 
 	EndMode2D();
-  float scroll = GetMouseWheelMove(); // Obtém o movimento do scroll do mouse
-    // Ajusta o zoom com base no movimento do scroll
-    cam->zoom += scroll;
-
-    // Limita o zoom a um valor mínimo e máximo (ajuste conforme necessário)
-    if (cam->zoom < 0.7f) cam->zoom = 0.7f;
-    if (cam->zoom > 1.0f) cam->zoom = 1.0f;
 }
 
 #include "raygui.h"
@@ -318,6 +379,28 @@ void DrawGameGui(void)
 
 	if(IsKeyPressed(KEY_ESCAPE)){
 		game.pause = !game.pause;
+	}
+
+	if(game.gameOver)
+	{
+		Vector2 textSize = MeasureTextEx(GetFontDefault(), "GAME OVER", 128, 3);
+		Vector2 textScoreSize = MeasureTextEx(GetFontDefault(), TextFormat("Score : %d",game.hud.realScore), 32, 0);
+		Vector2 textRestart = MeasureTextEx(GetFontDefault(),"Press Enter to Restart",24,0);
+		Vector2 position = (Vector2){SCREEN_WIDTH/2 -  textSize.x/2,SCREEN_HEIGHT/3};
+		
+		DrawTextEx(GetFontDefault(),"GAME OVER",position, 128,3, WHITE);
+		position.y += textSize.y;
+		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],TextFormat("Score : %d",game.hud.realScore),position, 32,0, WHITE);
+		position.y += textScoreSize.y;
+		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],"Press Enter to Restart",position, 24,0, WHITE);
+		position.y += textRestart.y;
+		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],"Press ESCAPE to back menu",position, 24,0, WHITE);
+	
+		if(IsKeyPressed(KEY_ENTER)){RestartGame();}
+		if(IsKeyPressed(KEY_ESCAPE)){
+			RestartGame();
+			ChangeScreen(SCREEN_TITLE);
+		}
 	}
 
 	if(game.showCardMenu)

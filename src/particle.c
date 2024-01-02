@@ -4,6 +4,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 Emitter emitters[MAX_EMITTERS];
 Particle particles[MAX_PARTICLES];
@@ -30,6 +31,7 @@ Emitter* AddEmitter(Vector2 position,Vector2 velocity, Vector2 randVelRangeX, Ve
     emitter.randomPositionRangeX = Vector2Zero();
     emitter.randomPositionRangeY = Vector2Zero();
     emitter.active = true;
+    emitter.particlesPerEmit = 1;
     if(nEmitters != MAX_EMITTERS){
     	emitters[nEmitters++] = emitter;
     	return &emitters[nEmitters - 1];
@@ -55,7 +57,8 @@ void UpdateEmitter(Emitter* emitter)
 	if(GetTime() > emitter->lastTimeEmit + emitter->emissionRate)
 	{
 		emitter->lastTimeEmit = GetTime();
-		if(nParticles != MAX_PARTICLES){
+		for (int i = 0; i < emitter->particlesPerEmit; ++i)
+		{
 			Particle p;
 			p.creationTime = GetTime();
 			p.position = emitter->position;
@@ -70,13 +73,19 @@ void UpdateEmitter(Emitter* emitter)
 			p.gravity = emitter->gravity;
 			p.position.x += RandomFloat(emitter->randomPositionRangeX.x, emitter->randomPositionRangeX.y);
 			p.position.y += RandomFloat(emitter->randomPositionRangeY.x, emitter->randomPositionRangeY.y);
-			particles[nParticles++] = p;
+			p.text[0] = 0;
+			if(nParticles != MAX_PARTICLES){
+				particles[nParticles++] = p;
+			}
 		}
 	}
 }
 
 void DrawParticles(void)
 {
+
+
+	//Remove dead emitters
 	for (int i = 0; i < nEmitters; ++i){
 		if(emitters[i].lifeTime < 0){continue;}
 		if(GetTime() > emitters[i].creationTime + emitters[i].lifeTime){
@@ -86,6 +95,7 @@ void DrawParticles(void)
 		}
 	}
 
+	//Update  emitters
 	for (int i = 0; i < nEmitters; ++i){
 		if(emitters[i].active == false){continue;}
 		UpdateEmitter(&emitters[i]);
@@ -112,6 +122,28 @@ void DrawParticles(void)
 
 		p->position.x += p->velocity.x * GetFrameTime();
 		p->position.y += p->velocity.y * GetFrameTime();
-		DrawRectangle(p->position.x, p->position.y, size.x, size.y,color);
+		if(p->text[0] == 0){DrawRectangle(p->position.x, p->position.y, size.x, size.y,color);}
+		else {
+			DrawText(p->text, p->position.x, p->position.y, size.x, color);
+		}
 	}
+}
+
+
+Particle* AddParticleText(char* text,Vector2 position,Vector2 velocity,int sizeBegin,int sizeEnd,float lifespan,Color color)
+{
+	Particle p;
+	strcpy(p.text, text);
+	p.position = position;
+	p.velocity = velocity;
+	p.lifespan = lifespan;
+	p.gravity = 0;
+	p.creationTime = GetTime();
+	p.sizeBegin = (Vector2){sizeBegin,sizeBegin};
+	p.sizeEnd = (Vector2){sizeEnd,sizeEnd};
+	p.colorBegin = p.colorEnd = color;
+	if(nParticles != MAX_PARTICLES){
+		particles[nParticles++] = p;
+	}
+	return &particles[nParticles - 1];
 }

@@ -9,6 +9,7 @@ typedef struct
 {
 	Entity base;
 	int health;
+	int maxHealth;
 	bool hurtAnimation;
 	float  lastTimeHurt;
 
@@ -17,10 +18,24 @@ typedef struct
 	float  nextLevelXp;
 
 	float firerate;
-
 	Emitter* em;
+
+	//Controller Modifiers
+	float bulletSizeModifier; //feito
+	int bulletsPerShoot; //feito
+	float fireRateModifier; //feito
+	float invincibleTimeModifier; //feito
+	//LaserBeam
+	int orbAroundTheShip;
+	int piercingBulletsCount; //feito
+	float regen;
+	float speedModifier; //feito
+	float xpBoostModifier; //feito
+	bool wasd;
 }Controller;
 
+
+void InitAtributes(Controller * c); //Resets atributes of controller
 Controller* CreateController(cpVect position);
 void 	   UpdateController(Controller* c);
 void       DrawController(Controller* c);

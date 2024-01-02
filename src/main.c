@@ -66,7 +66,7 @@ int main(void)
     SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messsages
 #endif
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib gamejam template");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Astro Raider");
     SetExitKey(KEY_NULL);
     InitGame();
     // Render texture to draw full screen, enables screen scaling
@@ -99,18 +99,19 @@ int main(void)
 void UpdateDrawFrame(void)
 {
     BeginTextureMode(target);
-        ClearBackground(RAYWHITE);
+        ClearBackground(BLACK);
         DrawCurrentScreen();
     EndTextureMode();
     #define MIN(a, b) (((a) < (b)) ? (a) : (b))
     float scale = MIN((float)GetScreenWidth()/SCREEN_WIDTH, (float)GetScreenHeight()/SCREEN_HEIGHT);
     // Render to screen (main framebuffer)
     BeginDrawing();
-      ClearBackground(RAYWHITE);     // Clear screen background
+      ClearBackground(BLACK);     // Clear screen background
        DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
                            (Rectangle){ (GetScreenWidth() - ((float)SCREEN_WIDTH*scale))*0.5f, (GetScreenHeight() - ((float)SCREEN_HEIGHT*scale))*0.5f,
                            (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
        DrawCurrentScreenGui();
+        DrawTexture(game.textures[IMG_CURSOR], GetMouseX(),GetMouseY(), WHITE);
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }

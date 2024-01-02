@@ -8,6 +8,11 @@ void ChangeScreen(ScreenIndex index){
 	currentScreen = index;
 }
 
+ScreenIndex GetCurrentScreen()
+{
+	return currentScreen;
+}
+
 void DrawCurrentScreen()
 {
 	switch (currentScreen) {

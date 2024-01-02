@@ -24,10 +24,12 @@ typedef struct
 	unsigned char isAlive;
 	cpBody* body;
 	cpShape* shape;
+	int health;
+	bool wasd;
 }Asteroid,Bullet,Entity;
 
 Entity CreateEntity(cpVect position,int imageID,float scale);
-Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle);
+Bullet* CreateBullet(Texture* bulletTexture,cpVect position,cpVect velocity,cpFloat angle,float scale);
 Asteroid* CreateAsteroid();
 cpVect GetRandomPosition(int textWidth,int textHeight);
 

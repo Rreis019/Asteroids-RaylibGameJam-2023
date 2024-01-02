@@ -14,6 +14,8 @@ typedef struct
 	float creationTime;
 	float lifespan;
 	int gravity;
+
+	char text[32];
 }Particle;
 
 typedef struct 
@@ -34,6 +36,7 @@ typedef struct
 	float lastTimeEmit;
 	float creationTime;
 	float gravity;
+	int particlesPerEmit;
 
 	bool active;
 }Emitter;
@@ -41,6 +44,8 @@ typedef struct
 Emitter* AddEmitter(Vector2 position,Vector2 velocity, Vector2 randVelRangeX, Vector2 randVelRangeY,float emitRate, float particleLife,float emitLife,
                       Color colorBegin, Color colorEnd,
                       Vector2 sizeBegin,Vector2 sizeEnd);
+
+Particle* AddParticleText(char* text,Vector2 position,Vector2 velocity,int sizeBegin,int sizeEnd,float lifespan,Color color);
 void DrawParticles(void);
 
 

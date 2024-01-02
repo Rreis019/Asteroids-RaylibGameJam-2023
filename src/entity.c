@@ -22,15 +22,16 @@ Entity CreateEntity(cpVect position,int image,float scale)
     return e;
 }
 
-Bullet* CreateBullet(cpVect position,cpVect velocity,cpFloat angle)
+Bullet* CreateBullet(Texture* bulletTexture,cpVect position,cpVect velocity,cpFloat angle,float scale)
 {
 	Bullet* bullet = malloc(sizeof(Bullet));
 	//b.velocity = velocity;
 	//b.rotation = rotation;
-	bullet->texture = &game.textures[IMG_BULLET];
-	bullet->textWidth =  bullet->texture->width;
-	bullet->textHeight = bullet->texture->height;
+	bullet->texture = bulletTexture;
+	bullet->textWidth =  bullet->texture->width * scale;
+	bullet->textHeight = bullet->texture->height * scale;
 	bullet->isAlive = 1;
+    bullet->health = 1;
 
 	bullet->body  = cpSpaceAddBody(game.space,cpBodyNew(1.0, cpMomentForBox(1.0f,bullet->textWidth,bullet->textHeight)));
 	cpBodySetPosition(bullet->body, position);
@@ -169,7 +170,6 @@ void UpdateAsteroid(Entity* b)
     cpFloat currentAngle = cpBodyGetAngle(b->body); // Obter o ângulo atual
     cpBodySetAngle(b->body, currentAngle + randomRotation); // Definir um novo ângulo somando a rotação aleatória
 
-
     Camera2D* cam = &game.camera;
 
     if(isOutOfBound(b,cam)){
@@ -192,7 +192,7 @@ void DrawEntity(Entity* ent)
 
 void DestroyEntity(Entity* ent) {
 	//assert(ent->shape != NULL && "NULLO");
-    printf("Entity destroy\n");
+    //printf("Entity destroy\n");
     cpSpaceRemoveShape(game.space, ent->shape);
  	cpSpaceRemoveBody(game.space, ent->body);
  	cpShapeFree(ent->shape);

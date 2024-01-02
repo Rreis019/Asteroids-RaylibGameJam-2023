@@ -1,13 +1,41 @@
 #include "chipmunk/chipmunk_types.h"
+#include "entity.h"
 #include "game.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "screen.h"
 #include <stdio.h>
 #include "controller.h"
+
+
+void InitAtributes(Controller* c)
+{
+	c->maxHealth = 3;
+	c->health = c->maxHealth;
+	c->firerate = 0.5f;
+    c->nextLevelXp = 200;
+    c->experience = 0;
+    c->level = 0;
+    c->wasd = false;
+	c->bulletSizeModifier = 1.0f;
+	c->bulletsPerShoot = 1;
+	c->fireRateModifier = 1.0f;
+	c->invincibleTimeModifier = 1.0f;
+	c->piercingBulletsCount = 1;
+	c->orbAroundTheShip = 0;
+	c->speedModifier = 1.0f;
+	c->xpBoostModifier = 1;
+
+	//float regen;
+	//LaserBeam
+	//RoundBullets
+}
+
 
 Controller* CreateController(cpVect position)
 {
 	Controller* c = malloc(sizeof(Controller));
+    InitAtributes(c);
 	Entity* ent = (Entity*)c;
     ent->textHeight =  64;
 	ent->textWidth  =  64;
@@ -22,12 +50,6 @@ Controller* CreateController(cpVect position)
     cpShapeSetElasticity(ent->shape, 0.8);
     cpShapeSetUserData(ent->shape,c);
     c->hurtAnimation = false;
-
-    c->firerate = 1.0f;
-
-    c->nextLevelXp = 150;
-    c->experience = 0;
-    c->level = 0;
     c->em = AddEmitter(
 	        (Vector2){ 0,0 },
 	        (Vector2){ 0,0} ,
@@ -58,48 +80,53 @@ void UpdateController(Controller* c)
     //cpFloat angle = cpBodyGetAngle(ent->body);
     // Atualizar a rotação do corpo baseado nos controles do jogador
    	Vector2 mousePosition = GetMousePosition(); // Obtém a posição atual do mouse
+	
+	cpFloat playerAngle = cpBodyGetAngle(ent->body);
+	cpFloat mouseAngle;
 
-    // Calcular a direção do vetor entre a entidade e o mouse
-    cpVect direction = cpvsub((cpVect){mousePosition.x,mousePosition.y}, (cpVect){GetScreenWidth()/2,GetScreenHeight()/2});
+   	if(game.player->wasd)
+   	{
+	  	if (IsKeyDown(KEY_A)){playerAngle -= DEG2RAD * 6;}
+	    if (IsKeyDown(KEY_D)){playerAngle += DEG2RAD * 6;}
+	    cpBodySetAngle(ent->body, playerAngle);
+   	}
+
+	//Calcular a direção do vetor entre a entidade e o mouse
+	cpVect direction = cpvsub((cpVect){mousePosition.x,mousePosition.y}, (cpVect){GetScreenWidth()/2,GetScreenHeight()/2});
 
     // Calcular o ângulo em radianos usando atan2
-    cpFloat angle = atan2(direction.y, direction.x);
-    angle += 90 * DEG2RAD;
-
-    // Converter para graus se necessário
-
-    // Define o ângulo para olhar na direção do mouse
-    cpBodySetAngle(ent->body, angle);
-
-    if (IsKeyDown(KEY_A)){
-        angle -= DEG2RAD * 6;
-        cpBodySetAngle(ent->body,  angle);
-    }
-    if (IsKeyDown(KEY_D)){
-        angle += DEG2RAD * 6;
-        cpBodySetAngle(ent->body, angle);
-    }
-
-
+    mouseAngle = atan2(direction.y, direction.x);
+    mouseAngle += 90 * DEG2RAD;
+	
+	if(c->wasd != true){cpBodySetAngle(ent->body, mouseAngle);}
+  
 	if (IsKeyDown(KEY_SPACE))
 	{
 	    static float lastTimeShoot = 0;
-	    if (GetTime() > lastTimeShoot + c->firerate)
+	    float spread = 5.0f;
+	    if (GetTime() > lastTimeShoot + (c->firerate / c->fireRateModifier)) 
 	    {
 	        lastTimeShoot = GetTime();
+	        float bulletAngle = (mouseAngle * RAD2DEG) - ((spread * c->bulletsPerShoot)/2);
 
-           	cpFloat angle = cpBodyGetAngle(ent->body);
-	   		float rotationRadians = angle +DEG2RAD * 90;
-	   		cpVect bulletVelocity = cpBodyGetVelocity(ent->body);
-	        bulletVelocity.x += cos(rotationRadians) * -1000;
-	        bulletVelocity.y += sin(rotationRadians) * -1000;
-	        AddBullet(CreateBullet(cpBodyGetPosition(ent->body), bulletVelocity, angle));
+
+	   		for (int i = 0; i < c->bulletsPerShoot; ++i)
+	   		{
+	   			
+	   			float rotationRadians = (bulletAngle+90) * DEG2RAD;
+		   		cpVect bulletVelocity = cpBodyGetVelocity(ent->body);
+		        bulletVelocity.x += cos(rotationRadians) * -1000;
+		        bulletVelocity.y += sin(rotationRadians) * -1000;
+		        
+		        Bullet* b = CreateBullet(&game.textures[IMG_BULLET_BLUE],cpBodyGetPosition(ent->body), bulletVelocity, mouseAngle,c->bulletSizeModifier); 
+		        b->health = c->piercingBulletsCount;
+		        AddBullet(b);
+	   			bulletAngle += spread*2;
+	   		}
+
     	    PlaySound(game.sfx[AUDIO_LASER]);
 	    }
 	}
-
-    
-
 
 	#define THRUST_FORCE 30
 	static float lastTimeW = -100;
@@ -108,8 +135,8 @@ void UpdateController(Controller* c)
 	    cpFloat angle = cpBodyGetAngle(ent->body);
    		float rotationRadians = angle +DEG2RAD * 90;
    		cpVect velocity = cpBodyGetVelocity(ent->body);
-        velocity.x += cos(rotationRadians) * -THRUST_FORCE;
-        velocity.y += sin(rotationRadians) * -THRUST_FORCE;
+        velocity.x += cos(rotationRadians) * (-THRUST_FORCE * c->speedModifier);
+        velocity.y += sin(rotationRadians) * (-THRUST_FORCE * c->speedModifier);
 		cpBodySetVelocity(ent->body, velocity);
 
 
@@ -141,6 +168,11 @@ void UpdateController(Controller* c)
     	lastTimeW = -100;
     }
 
+    for (int i = 0; i < c->orbAroundTheShip; ++i)
+    {
+
+    }
+
     // Limitar a velocidade máxima da nave
     #define MAX_SPEED 400
     float magnitude = cpvlength(cpBodyGetVelocity(ent->body));
@@ -155,7 +187,7 @@ void UpdateController(Controller* c)
 void DrawController(Controller* c)
 {
 	static bool draw = true;
-	if(c->hurtAnimation && GetTime() > c->lastTimeHurt + INVICIBLE_TIME_SECONDS){
+	if(c->hurtAnimation && GetTime() > c->lastTimeHurt + INVICIBLE_TIME_SECONDS * c->invincibleTimeModifier){
 		c->hurtAnimation = false;	
 		draw = true;
 	}
@@ -176,13 +208,12 @@ void DrawController(Controller* c)
 
 void GainExperience(Controller* c,int xp)
 {
-    c->experience += xp;
+    c->experience += xp * c->xpBoostModifier;
 
     if(c->experience > c->nextLevelXp){
         c->experience = c->experience -c->nextLevelXp;
         c->level++;
-        c->nextLevelXp *= 1.2;
+        c->nextLevelXp *= 1.5;
         onPlayerLevelUP();
-        printf("teste");
     }
 }

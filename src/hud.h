@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdbool.h>
-#define MAX_LIFES 3
 #define MAX_LEVEL 30
 
 typedef struct

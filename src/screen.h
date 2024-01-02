@@ -11,3 +11,4 @@ typedef enum {
 void DrawCurrentScreen();
 void DrawCurrentScreenGui();
 void ChangeScreen(ScreenIndex index);
+ScreenIndex GetCurrentScreen();

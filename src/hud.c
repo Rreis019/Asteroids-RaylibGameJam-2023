@@ -59,7 +59,7 @@ void DrawHud(Hud* hud)
    startPositionX -= game.textures[IMG_SPACE_LIFE].width + MARGIN_BETWEEN_LIFES;
    int startPositionY =  10;
 
-   for (int i = 0; i < MAX_LIFES; ++i)
+   for (int i = 0; i < game.player->maxHealth; ++i)
    {
    		if(*hud->playerHealth > i)
    		{
@@ -77,8 +77,23 @@ void DrawHud(Hud* hud)
    bound.x = (float)GetScreenWidth()/2 - bound.width/2;
    bound.y = GetScreenHeight() - (10+bound.height);
    GuiProgressBar(bound, "", "",&game.player->experience, 0,game.player->nextLevelXp);
+   
+   if(game.showCardMenu)
+   {
+      Color rainbowColor;
+      rainbowColor.r = (unsigned char)(255 * sinf(GetTime()));
+      rainbowColor.g = (unsigned char)(255 * sinf(GetTime() + 2));
+      rainbowColor.b = (unsigned char)(255 * sinf(GetTime() + 4));
+      rainbowColor.a = 255;
+      Vector2 textSize = MeasureTextEx(GetFontDefault(), "LEVEL UP", 24, 0);
+      DrawText(TextFormat("LEVEL UP",game.player->level + 1), bound.x + (bound.width/2 - textSize.x/2), bound.y - 30, 24, rainbowColor);
+   }else{
+      Vector2 textSize = MeasureTextEx(GetFontDefault(), TextFormat("LvL: %d",game.player->level + 1), 24, 0);
+      DrawText(TextFormat("LvL: %d",game.player->level + 1), bound.x + (bound.width/2 - textSize.x/2), bound.y - 30, 24, WHITE);
+   }
 
 
+   DrawTextEx(game.fonts[FONT_UBUNTU_BOLD],TextFormat("Wave : %d",game.spawner.currentWave), (Vector2){10,50},24,0,WHITE);
+   DrawTextEx(game.fonts[FONT_UBUNTU_BOLD],TextFormat("Enimies : %d",game.spawner.nEnemy), (Vector2){10,80},24,0,WHITE);
 
-   DrawText(TextFormat("LvL: %d",game.player->level + 1), bound.x + bound.width/2, bound.y - 30, 24, WHITE);
 }
