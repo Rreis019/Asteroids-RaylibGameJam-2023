@@ -8,6 +8,7 @@
 #include "hud.h"
 #include "raylib.h"
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "particle.h"
@@ -16,6 +17,9 @@
 #include "wave_spawner.h"
 
 Game game;
+
+void InitGameOverPopup();
+void DrawGameOver();
 
 cpBool BulletvsAsteroidBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 {
@@ -40,7 +44,7 @@ cpBool BulletvsAsteroidBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userD
 
 	Vector2 up = {0,-100};
 	char text[32];
-	sprintf_s(text,32,"%d",100);
+	sprintf(text,"%d",100);
 	AddParticleText(text,(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
 
 	return cpTrue;
@@ -61,7 +65,8 @@ cpBool PlayerVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 	player->lastTimeHurt = GetTime();
 	player->hurtAnimation = true;
 	player->health--;
-	
+
+	if(player->health == 0){InitGameOverPopup();}
 	return cpTrue;
 }
 
@@ -91,7 +96,7 @@ cpBool EnemyVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 
 	 		Vector2 up = {0,-100};
 	 		char text[32];
-	 		sprintf_s(text,32,"%d",enemy->score);
+	 		sprintf(text,"%d",enemy->score);
 			AddParticleText(text,(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
 
     	}
@@ -100,9 +105,25 @@ cpBool EnemyVsAnyBegin(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 	return cpTrue;
 }
 
+cpBool BulletVsBullet(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
+{
+	cpShape *a, *b;
+    cpArbiterGetShapes(arb, &a, &b);
+	Bullet* bulletEntity = (Bullet*)cpShapeGetUserData(a);
+    Bullet* bulletEntity2 = (Bullet*)cpShapeGetUserData(b);
+	
+    bulletEntity->health--;
+    bulletEntity2->health--;
+
+    if(bulletEntity->health <= 0){bulletEntity->isAlive = 0;}
+   if(bulletEntity2->health <= 0){bulletEntity2->isAlive = 0;}
+   	return cpTrue;
+}
+
 
 void InitGame()
 {
+	game.audio = 0.05;
 	LoadResources();
  	game.space = cpSpaceNew();
  	game.player =  CreateController(cpv(300,300));
@@ -119,7 +140,11 @@ void InitGame()
 
 	cpCollisionHandler* handlerEnemy =  cpSpaceAddWildcardHandler(game.space,ENEMY_COLISSION_TYPE);
 	handlerEnemy->beginFunc = EnemyVsAnyBegin;
+
+	cpCollisionHandler* handlerBullet =  cpSpaceAddCollisionHandler(game.space,PLAYER_BULLET_COLISSION_TYPE,ENEMY_BULLET_COLISSION_TYPE);
+	handlerBullet->beginFunc = BulletVsBullet;
 	
+
 	InitEnemyTypes();
 	InitWaveSpawner(&game.spawner);
 	Camera2D camera = { 0 };
@@ -145,17 +170,17 @@ void DestroyGame()
 void AddAsteroid(Asteroid* a){
     if(game.nAsteroids == MAX_ASTEROIDS) {
     	DestroyEntity(a);
-    	printf("max\n");
     	return;
     }
     game.asteroids[game.nAsteroids++] = a;
 }
-void AddEnemy(Enemy* e){
+Enemy* AddEnemy(Enemy* e){
 	if(game.nEnemys == MAX_ENEMYS) {
 		DestroyEntity((Entity*)e);
-		return;
+		return NULL;
 	}
 	game.enemys[game.nEnemys++] = e;
+	return e;
 }
 void AddBullet(Bullet* b){
 	if(MAX_BULLETS == game.nBullets){ return;}
@@ -193,7 +218,11 @@ void LoadResources()
 		game.textures[IMG_METEOR_BROWN_BIG + i] = LoadTexture(TextFormat(RESOURCES_PATH "Meteors/meteorBrown_big%d.png",i+1));
 	}
 
-	game.textures[IMG_BLACK_PANEL] = LoadTexture(RESOURCES_PATH "blank_panel.png");
+	game.textures[IMG_WHITE] = LoadTexture(RESOURCES_PATH "white.png");
+
+	//LoadUI
+	game.textures[IMG_BLUE_PANEL] = LoadTexture(RESOURCES_PATH "ui/blue_panel.png");
+	game.textures[IMG_BUTTON_BLUE] = LoadTexture(RESOURCES_PATH "ui/blue_button04.png");
 
 	//LoadCardIcons
 	game.textures[IMG_CARD_BIGGER_BULLET] = LoadTexture(RESOURCES_PATH "CardIcons/BiggerBullets.png");
@@ -230,10 +259,13 @@ void LoadResources()
 	InitAudioDevice();
 	game.sfx[AUDIO_LASER] = LoadSound(AUDIO_PATH "laserSmall_002.wav");
 	game.sfx[AUDIO_THRUST] = LoadSound(AUDIO_PATH "thrusterFire_003.wav");
+	game.sfx[AUDIO_CLICK] = LoadSound(AUDIO_PATH "click_001.ogg");
+	game.sfx[AUDIO_DROP] = LoadSound(AUDIO_PATH "drop_002.ogg");
+
 
 	for (int i = 0; i < MAX_SFX; ++i)
 	{
-		SetSoundVolume(game.sfx[i], 0.05);
+		SetSoundVolume(game.sfx[i], game.audio);
 	}
 
 }
@@ -303,7 +335,8 @@ void RestartGame(void)
 	game.nBullets = 0;
 	game.nEnemys = 0;
 	game.showCardMenu = game.gameOver = game.pause = false;
-
+	game.player->em->active = false;
+	RemoveAllParticles();
 }
 
 
@@ -340,10 +373,8 @@ void onPlayerLevelUP()
 
 void DrawGame(void)
 {
-	if(game.player->health == 0){
-		game.gameOver = true;
-		game.pause = true;
-	}
+	if(game.player->health == 0){game.pause = true;}
+
 
 	if(!game.pause)
 		cpSpaceStep(game.space, GetFrameTime());
@@ -353,25 +384,22 @@ void DrawGame(void)
 	UpdateWave(&game.spawner);
 	BeginMode2D(game.camera);
 	DrawParticles();
+
 	UpdateCollectionEntity(game.bullets,&game.nBullets,UpdateEntity,DrawEntity,DestroyEntity);
 	UpdateCollectionEntity(game.asteroids,&game.nAsteroids,UpdateAsteroid,DrawEntity,DestroyEntity);
 	UpdateCollectionEntity((Entity**)game.enemys,&game.nEnemys,(tpUpdateEnt)UpdateEnemy,(tpFunc)DrawEnemy,DestroyEntity);
+
 
 	if(!game.pause)
 		UpdateController(game.player);
 
 	DrawController(game.player);
 	//DrawColliders(game.space);
-
-	if(IsKeyPressed(KEY_F)){
-		cpVect pos = cpBodyGetPosition(game.player->base.body);
-		Vector2 up = {0,-140};
-		AddParticleText("1000",(Vector2){pos.x,pos.y},up,24,32,0.7,WHITE);
-	}
-
 	EndMode2D();
 }
 
+
+void DrawPauseMenu();
 #include "raygui.h"
 void DrawGameGui(void)
 {
@@ -380,29 +408,8 @@ void DrawGameGui(void)
 	if(IsKeyPressed(KEY_ESCAPE)){
 		game.pause = !game.pause;
 	}
-
-	if(game.gameOver)
-	{
-		Vector2 textSize = MeasureTextEx(GetFontDefault(), "GAME OVER", 128, 3);
-		Vector2 textScoreSize = MeasureTextEx(GetFontDefault(), TextFormat("Score : %d",game.hud.realScore), 32, 0);
-		Vector2 textRestart = MeasureTextEx(GetFontDefault(),"Press Enter to Restart",24,0);
-		Vector2 position = (Vector2){SCREEN_WIDTH/2 -  textSize.x/2,SCREEN_HEIGHT/3};
-		
-		DrawTextEx(GetFontDefault(),"GAME OVER",position, 128,3, WHITE);
-		position.y += textSize.y;
-		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],TextFormat("Score : %d",game.hud.realScore),position, 32,0, WHITE);
-		position.y += textScoreSize.y;
-		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],"Press Enter to Restart",position, 24,0, WHITE);
-		position.y += textRestart.y;
-		DrawTextEx(game.fonts[FONT_UBUNTU_REGULAR],"Press ESCAPE to back menu",position, 24,0, WHITE);
-	
-		if(IsKeyPressed(KEY_ENTER)){RestartGame();}
-		if(IsKeyPressed(KEY_ESCAPE)){
-			RestartGame();
-			ChangeScreen(SCREEN_TITLE);
-		}
-	}
-
+	if(game.gameOver){DrawGameOver();}
+	DrawPauseMenu();
 	if(game.showCardMenu)
 	{
 		Vector2 textSize = MeasureTextEx(GetFontDefault(), "Choose a Card", 64, 6);
@@ -412,4 +419,133 @@ void DrawGameGui(void)
 		DrawCard(&game.currentCards[1],(Vector2){GetScreenWidth()/2 + 10,position.y + textSize.y + 10});
 	}
 
+
+
+
+}
+
+
+
+float panelGoDownPercentage = 0;
+float percentageScore = 0;
+float percentageWave = 0;
+bool showButtons = false;
+
+void InitGameOverPopup()
+{
+	if(game.gameOver == true){return;}
+	game.gameOver = true;
+	panelGoDownPercentage =  -0.5f;
+	percentageScore = 0;
+	percentageWave = 0;
+	showButtons = false;
+}
+
+void DrawOutlinedText(Font f,const char *text, Vector2 p, int fontSize, Color color, int outlineSize,int spacing, Color outlineColor) {
+    DrawTextEx(f,text,(Vector2){p.x - outlineSize, p.y - outlineSize}, fontSize,spacing, outlineColor);
+    DrawTextEx(f,text,(Vector2){p.x + outlineSize, p.y - outlineSize}, fontSize,spacing, outlineColor);
+    DrawTextEx(f,text,(Vector2){p.x - outlineSize, p.y + outlineSize}, fontSize,spacing, outlineColor);
+    DrawTextEx(f,text,(Vector2){p.x + outlineSize, p.y + outlineSize}, fontSize,spacing, outlineColor);
+    DrawTextEx(f,text,(Vector2){p.x, p.y}, fontSize,0, color);
+}
+
+
+void DrawPauseMenu()
+{
+	if(game.pause && game.showCardMenu == false && game.gameOver == false)
+	{
+		Vector2 position = (Vector2){GetScreenWidth()/2,GetScreenHeight()/4};	
+		position.x -= MeasureTextEx(game.fonts[FONT_UBUNTU_BOLD],"Game is Paused", 64, 0).x /2;
+		DrawOutlinedText(game.fonts[FONT_UBUNTU_BOLD],"Game is Paused", position, 64,WHITE,2,0, BLACK);
+		position.y += 60;
+
+		position.x = GetScreenWidth()/2 -  MeasureTextEx(game.fonts[FONT_UBUNTU_REGULAR],"Press Enter to return to the menu", 24, 0).x /2;
+		DrawOutlinedText(game.fonts[FONT_UBUNTU_REGULAR],"Press Enter to return to the menu", position, 24,WHITE,2,0, BLACK);
+
+		if(IsKeyPressed(KEY_ENTER)){
+			RestartGame();
+			ChangeScreen(SCREEN_TITLE);
+		}
+
+	}
+}
+
+void DrawGameOver()
+{
+	DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0,0,0,124});
+	GuiSetStyle(DEFAULT,TEXT_SIZE,16);
+
+	panelGoDownPercentage += 1.0f * GetFrameTime();
+	if(panelGoDownPercentage >= 0.5f){
+		panelGoDownPercentage = 0.5f;
+
+
+		if(percentageScore >= 1.0f){
+			
+			percentageScore = 1.0f;
+			if(percentageWave >= 1.0f){
+				percentageWave = 1.0f;
+				showButtons = true;
+			}
+			else{
+				if((int)(percentageWave * game.spawner.currentWave) !=
+					(int)(percentageWave+1*GetFrameTime()) * game.spawner.currentWave
+				){
+					PlaySound(game.sfx[AUDIO_DROP]);
+				}
+
+				percentageWave += 1 * GetFrameTime();
+				
+			}
+		}
+		else{
+			percentageScore += 1 * GetFrameTime();
+			PlaySound(game.sfx[AUDIO_DROP]);
+		}
+	}
+	
+	Vector2 panelPosition = (Vector2){GetScreenWidth()/2 - 150, GetScreenHeight() * panelGoDownPercentage - 150};
+
+	#define t game.textures[IMG_BLUE_PANEL]
+
+  	NPatchInfo nPatchInfo = {0}; // Todas as bordas iguais
+    nPatchInfo.source = (Rectangle){ 0, 0, t.width, t.height };
+    nPatchInfo.left = nPatchInfo.top = nPatchInfo.right = nPatchInfo.bottom = 5; // Larguras das bordas
+
+	//SetShapesTexture(game.textures[IMG_BLUE_PANEL], (Rectangle){0,0,game.textures[IMG_BLUE_PANEL].width,game.textures[IMG_BLUE_PANEL].height});
+	//DrawRectangle(panelPosition.x,panelPosition.y, 300, 300, WHITE);
+	//SetShapesTexture((Texture2D){0}, (Rectangle){0});
+
+    #define PANEL_WIDTH 170
+	DrawTextureNPatch(game.textures[IMG_BLUE_PANEL], nPatchInfo, (Rectangle){panelPosition.x,panelPosition.y,300,PANEL_WIDTH}, (Vector2){0, 0}, 0, (Color){.a = 255 * panelGoDownPercentage*2,.r = 255,.g = 255,.b = 255});
+
+	#define MARGIN_X 5
+
+	panelPosition.y += 20;
+	//Vector2 titleSize = MeasureTextEx(game.fonts[FONT_UBUNTU_BOLD],"GameOver", 32, 0);
+	DrawOutlinedText(game.fonts[FONT_UBUNTU_BOLD],"GameOver", (Vector2){panelPosition.x + (PANEL_WIDTH/2),panelPosition.y}, 32,WHITE,2,0, BLACK);
+	
+	panelPosition.x += 20;
+	panelPosition.y += 40;
+
+	DrawOutlinedText(game.fonts[FONT_UBUNTU_REGULAR],TextFormat("Score : %d",(int)(game.hud.realScore * percentageScore)),panelPosition, 24,WHITE,1,0, BLACK);
+
+	panelPosition.y += 30;
+	DrawOutlinedText(game.fonts[FONT_UBUNTU_REGULAR],TextFormat("Wave : %d",(int)(percentageWave * game.spawner.currentWave)),panelPosition, 24,WHITE,1,0, BLACK);
+
+	panelPosition.y += 30;
+
+	if(showButtons){
+		SetShapesTexture(game.textures[IMG_BUTTON_BLUE],(Rectangle){0,0,game.textures[IMG_BUTTON_BLUE].width,game.textures[IMG_BUTTON_BLUE].height});
+
+		if(GuiButton((Rectangle){panelPosition.x,panelPosition.y,120,35}, "Restart")){
+			RestartGame();
+		}
+		panelPosition.x += 120 + 10;
+		if(GuiButton((Rectangle){panelPosition.x,panelPosition.y,120,35}, "Menu")){
+			RestartGame();
+			ChangeScreen(SCREEN_TITLE);
+		}
+		SetShapesTexture(game.textures[IMG_WHITE], (Rectangle){ 0,0,game.textures[IMG_WHITE].width,game.textures[IMG_WHITE].height });
+	}
 }

@@ -94,7 +94,6 @@ Asteroid* CreateAsteroid()
     cpShapeSetElasticity(asteroid->shape, 0.8);
     cpShapeSetUserData(asteroid->shape, asteroid);
     cpShapeSetCollisionType(asteroid->shape, ASTEROID_COLISSION_TYPE);
-    
     // Definir a posição do asteroide com base na aleatoriedade
     cpVect asteroidPosition = cpv(0, 0);
     int side = rand() % 4;
@@ -120,6 +119,7 @@ Asteroid* CreateAsteroid()
     cpBodySetAngle(asteroid->body, randomInRange(0, 2 * PI));
     cpBodySetVelocity(asteroid->body, asteroidVelocity);
 
+
     return asteroid;
 }
 
@@ -142,7 +142,7 @@ bool isOutOfBound(Entity* b, Camera2D* cam) {
     cpFloat cameraTop = cam->target.y + cameraHalfHeight;
 
     cpFloat entityLeft = position.x - textWidth;
-    cpFloat entityRight = position.x + textWidth;
+    cpFloat entityRight = position.x + textWidth;   
     cpFloat entityBottom = position.y - textHeight;
     cpFloat entityTop = position.y + textHeight;
 

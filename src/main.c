@@ -111,7 +111,15 @@ void UpdateDrawFrame(void)
                            (Rectangle){ (GetScreenWidth() - ((float)SCREEN_WIDTH*scale))*0.5f, (GetScreenHeight() - ((float)SCREEN_HEIGHT*scale))*0.5f,
                            (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
        DrawCurrentScreenGui();
-        DrawTexture(game.textures[IMG_CURSOR], GetMouseX(),GetMouseY(), WHITE);
+    
+
+/*
+    if(GetCurrentScreen() == SCREEN_GAMEPLAY)
+    {
+        HideCursor();
+        DrawTexture(game.textures[IMG_CURSOR], GetMouseX() - (game.textures[IMG_CURSOR].width),GetMouseY() - (game.textures[IMG_CURSOR].height), WHITE);
+    }
+  */  
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }

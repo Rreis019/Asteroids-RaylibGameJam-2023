@@ -1,5 +1,7 @@
-
 #pragma once
+#include "raylib.h"
 
-void DrawTitleScreen();
+
+Rectangle DrawTitle();
+void DrawScreenBackground();
 void DrawTitleScreenGui();

@@ -26,7 +26,7 @@
 # Define required environment variables
 #------------------------------------------------------------------------------------------------
 # Define target platform: PLATFORM_DESKTOP, PLATFORM_WEB, PLATFORM_DRM
-PLATFORM              ?= PLATFORM_DESKTOP
+PLATFORM              ?= PLATFORM_WEB
 
 # Define project variables
 PROJECT_NAME          ?= AstroRaider
@@ -37,12 +37,12 @@ RAYLIB_PATH           ?= C:\\raylib
 RAYLIB_INCLUDE_PATH   ?= $(RAYLIB_PATH)/src
 RAYLIB_LIB_PATH       ?= $(RAYLIB_PATH)/src
 
-CHIPMUNK_PATH = C:\\chipmunk
+CHIPMUNK_PATH = C:\\chipmunkweb
 CHIPMUNK_INCLUDE_PATH = $(CHIPMUNK_PATH)/include
 CHIPMUNK_LIB_PATH = $(CHIPMUNK_PATH)/lib
 
 # Build mode for project: DEBUG or RELEASE
-BUILD_MODE            ?= DEBUG
+BUILD_MODE            ?= RELEASE
 
 # PLATFORM_WEB: Default properties
 BUILD_WEB_ASYNCIFY    ?= FALSE
@@ -146,7 +146,7 @@ endif
 #  -Wno-missing-braces  ignore invalid warning (GCC bug 53119)
 #  -Wno-unused-value    ignore unused return values of some functions (i.e. fread())
 #  -D_DEFAULT_SOURCE    use with -std=c99 on Linux and PLATFORM_WEB, required for timespec
-CFLAGS = -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result -Werror
+CFLAGS = -Wall -std=c99 -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result 
 
 ifeq ($(BUILD_MODE),DEBUG)
     CFLAGS += -g -D_DEBUG
@@ -192,7 +192,7 @@ LDFLAGS = -L. -L$(RAYLIB_LIB_PATH) -L$(CHIPMUNK_LIB_PATH)
 ifeq ($(PLATFORM),PLATFORM_DESKTOP)
     ifeq ($(PLATFORM_OS),WINDOWS)
         # resource file contains windows executable icon and properties
-        LDFLAGS += $(RAYLIB_PATH)/src/raylib.rc.data
+        LDFLAGS += game.rc.data
         # -Wl,--subsystem,windows hides the console window
         ifeq ($(BUILD_MODE), RELEASE)
             LDFLAGS += -Wl,--subsystem,windows

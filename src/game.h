@@ -9,20 +9,22 @@
 #include "wave_spawner.h"
 
 #define MAX_ASTEROIDS 10
-#define MAX_BULLETS 500
-#define MAX_ENEMYS 100
+#define MAX_BULLETS 3000
+#define MAX_ENEMYS 1000
 
 #define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_HEIGHT 720	
 
 typedef enum 
 {
 	IMG_SPACESHIP,	
 	IMG_CURSOR,
+	IMG_WHITE,
 	IMG_SPACE_BACKGROUND,
 	IMG_SPACE_LIFE,
 	IMG_METEOR_BROWN_BIG,
 	IMG_METEOR_BROWN_SMALL = 8,
+	IMG_BUTTON_BLUE,
 	IMG_ENEMY_BLACK1,
 	IMG_ENEMY_BLACK2,
 	IMG_ENEMY_BLACK3,
@@ -43,7 +45,7 @@ typedef enum
 	IMG_ENEMY_ORANGE3,
 	IMG_ENEMY_ORANGE4,
 	IMG_ENEMY_ORANGE5,
-	IMG_BLACK_PANEL,
+	IMG_BLUE_PANEL,
 	IMG_CARD_BIGGER_BULLET,
 	IMG_CARD_BULLET_PER_SHOOT,
 	IMG_CARD_FIRERATE,
@@ -78,6 +80,8 @@ typedef enum
 {
 	AUDIO_LASER,
 	AUDIO_THRUST,
+	AUDIO_CLICK,
+	AUDIO_DROP,
 	MAX_SFX
 }SFX_ID;
 
@@ -105,6 +109,7 @@ typedef struct
 	bool pause;
 	bool gameOver;
 	bool showCardMenu;
+	float audio;
 }Game;
 
 extern Game game;
@@ -119,7 +124,7 @@ void DrawBackground();
 void SpawnAsteroids();
 void AddAsteroid(Asteroid* asteroid);
 void AddBullet(Bullet* bullet);
-void AddEnemy(Enemy* e);
+Enemy* AddEnemy(Enemy* e);
 void RemoveBullet(int index);
 
 void LoadResources();

@@ -4,6 +4,7 @@
 #include "particle.h"
 
 #define INVICIBLE_TIME_SECONDS 0.3
+#define MAX_ORBITS 100
 
 typedef struct
 {
@@ -26,9 +27,10 @@ typedef struct
 	float fireRateModifier; //feito
 	float invincibleTimeModifier; //feito
 	//LaserBeam
-	int orbAroundTheShip;
+	Bullet* orbsAroundTheShip[MAX_ORBITS];
+	int nOrbs;
+
 	int piercingBulletsCount; //feito
-	float regen;
 	float speedModifier; //feito
 	float xpBoostModifier; //feito
 	bool wasd;
@@ -41,3 +43,4 @@ void 	   UpdateController(Controller* c);
 void       DrawController(Controller* c);
 void GainExperience(Controller* player,int xp);
 cpVect GetBackPosition(Controller* c);
+void AddOrb(Controller* c);

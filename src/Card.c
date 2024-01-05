@@ -10,7 +10,7 @@ void EmptyEffect(){}
 void BiggerBullet(){game.player->bulletSizeModifier += 0.5;}
 void BulletHell(){game.player->bulletsPerShoot++;}
 void FireRateBoost(){game.player->fireRateModifier += 0.50;}
-void InvincibleTime(){game.player->fireRateModifier += 0.25;}
+void InvincibleTime(){game.player->fireRateModifier += 2.0;}
 void PiercingBullet(){game.player->piercingBulletsCount++;}
 void IncSpeed(){ game.player->speedModifier += 0.25;}
 void IncXpBoost() {game.player->xpBoostModifier += 1.00;}
@@ -20,17 +20,18 @@ void IncMaxHealth(){
 }
 void SetWASD(){ game.player->wasd = true;}
 void RegenHealth(){ game.player->health = game.player->maxHealth;}
+void SpawnOrb(){ AddOrb(game.player);}
 
-#define MAX_CARDS 12
+#define MAX_CARDS 11
 Card cards[MAX_CARDS] = {
     (Card){.name = "Bigger Bullets", .description = "Increases bullet size by 50%", &game.textures[IMG_CARD_BIGGER_BULLET],.effect = BiggerBullet},
     (Card){.name = "Bullet Hell", .description = "Increases the number of bullets per shot", &game.textures[IMG_CARD_BULLET_PER_SHOOT],.effect = BulletHell},
     (Card){.name = "FireRate Boost", .description = "Boosts the rate of fire by 50%", &game.textures[IMG_CARD_FIRERATE],.effect = FireRateBoost},
-    (Card){.name = "Invincible Time", .description = "Extends invincibility by 25% duration after being hit", &game.textures[IMG_CARD_INVICIBLETIME],.effect = InvincibleTime},
-    (Card){.name = "Laser Beam", .description = "Upgrades your weapon to a laser", &game.textures[IMG_CARD_LASERBEAM],.effect = EmptyEffect},
+    (Card){.name = "Invincible Time", .description = "Extends invincibility by 200% duration after being hit", &game.textures[IMG_CARD_INVICIBLETIME],.effect = InvincibleTime},
+    //(Card){.name = "Laser Beam", .description = "Upgrades your weapon to a laser", &game.textures[IMG_CARD_LASERBEAM],.effect = EmptyEffect},
     (Card){.name = "Piercing Bullets", .description = "Allows bullets to pass through +1 enemy", &game.textures[IMG_CARD_PIERCING_SHOOT],.effect = PiercingBullet},
     (Card){.name = "Regen", .description = "Fully regenerates spaceship health", &game.textures[IMG_CARD_REGEN],.effect = RegenHealth},
-    (Card){.name = "Round Bullets", .description = "Fires bullets that orbit the spaceship", &game.textures[IMG_CARD_ROUNDBULLET],.effect = EmptyEffect},
+    (Card){.name = "Round Bullets", .description = "Fires bullets that orbit the spaceship", &game.textures[IMG_CARD_ROUNDBULLET],.effect = SpawnOrb},
     (Card){.name = "Swift Wing", .description = "Enhances aircraft speed by 25%", &game.textures[IMG_CARD_SPEED],.effect = IncSpeed},
     (Card){.name = "XP Boost", .description = "Increases XP gained by 100%", &game.textures[IMG_CARD_XPBOOST],.effect = IncXpBoost},
  	(Card){.name = "WASD", .description = "Spaceship movement will be controlled using the WASD keys.", &game.textures[IMG_CARD_WASD],.effect = SetWASD},

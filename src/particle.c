@@ -50,7 +50,7 @@ Color LerpColor(Color colorStart, Color colorEnd, float amount) {
 }
 
 
-float RandomFloat(float min, float max) {return min + ((float)rand() / RAND_MAX) * (max - min);}
+float RandomFloat(float min, float max) {return min + ((float)rand() / (float)RAND_MAX) * (max - min);}
 
 void UpdateEmitter(Emitter* emitter)
 {
@@ -83,7 +83,6 @@ void UpdateEmitter(Emitter* emitter)
 
 void DrawParticles(void)
 {
-
 
 	//Remove dead emitters
 	for (int i = 0; i < nEmitters; ++i){
@@ -129,6 +128,11 @@ void DrawParticles(void)
 	}
 }
 
+
+void RemoveAllParticles(void)
+{
+	nParticles = 0;
+}
 
 Particle* AddParticleText(char* text,Vector2 position,Vector2 velocity,int sizeBegin,int sizeEnd,float lifespan,Color color)
 {

@@ -92,8 +92,5 @@ void DrawHud(Hud* hud)
       DrawText(TextFormat("LvL: %d",game.player->level + 1), bound.x + (bound.width/2 - textSize.x/2), bound.y - 30, 24, WHITE);
    }
 
-
    DrawTextEx(game.fonts[FONT_UBUNTU_BOLD],TextFormat("Wave : %d",game.spawner.currentWave), (Vector2){10,50},24,0,WHITE);
-   DrawTextEx(game.fonts[FONT_UBUNTU_BOLD],TextFormat("Enimies : %d",game.spawner.nEnemy), (Vector2){10,80},24,0,WHITE);
-
 }

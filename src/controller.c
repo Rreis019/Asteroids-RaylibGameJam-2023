@@ -22,19 +22,27 @@ void InitAtributes(Controller* c)
 	c->fireRateModifier = 1.0f;
 	c->invincibleTimeModifier = 1.0f;
 	c->piercingBulletsCount = 1;
-	c->orbAroundTheShip = 0;
 	c->speedModifier = 1.0f;
 	c->xpBoostModifier = 1;
+	
+	for (int i = 0; i < c->nOrbs; ++i)
+	{
+		DestroyEntity(c->orbsAroundTheShip[i]);
+	}
+	c->nOrbs = 0;
 
 	//float regen;
 	//LaserBeam
 	//RoundBullets
+
+
 }
 
 
 Controller* CreateController(cpVect position)
 {
 	Controller* c = malloc(sizeof(Controller));
+	c->nOrbs = 0;
     InitAtributes(c);
 	Entity* ent = (Entity*)c;
     ent->textHeight =  64;
@@ -56,6 +64,7 @@ Controller* CreateController(cpVect position)
 	        (Vector2){ 0, 0 },
 	        (Vector2){ 0, 0 },
 	        0.005, 0.5f, -1.0f, ORANGE, RED, (Vector2){ 10, 10 }, (Vector2){ 1, 1 });
+    c->em->active = false;
 	return c; 
 }
 
@@ -168,9 +177,25 @@ void UpdateController(Controller* c)
     	lastTimeW = -100;
     }
 
-    for (int i = 0; i < c->orbAroundTheShip; ++i)
-    {
+    cpVect position = cpBodyGetPosition(c->base.body);
+	game.camera.target = (Vector2){ position.x,position.y };
 
+
+	#define DISTANCE_ORB 200 * c->bulletSizeModifier
+    for (int i = 0; i < c->nOrbs; ++i)
+    {
+    	Bullet* b = c->orbsAroundTheShip[i];
+    	cpFloat bulletAngle = cpBodyGetAngle(b->body);
+   		float rotationRadians = bulletAngle + DEG2RAD * 90;
+		Vector2 forwardVector = { cos(rotationRadians),sin(rotationRadians) };
+		forwardVector.x *= DISTANCE_ORB;
+		forwardVector.y *= DISTANCE_ORB;
+		forwardVector.x += position.x;
+		forwardVector.y += position.y;
+
+		bulletAngle += 3 * GetFrameTime();
+		cpBodySetAngle(b->body, bulletAngle);
+		cpBodySetPosition(b->body, (cpVect){forwardVector.x,forwardVector.y});
     }
 
     // Limitar a velocidade máxima da nave
@@ -180,8 +205,7 @@ void UpdateController(Controller* c)
         cpBodySetVelocity(ent->body, cpvmult(cpBodyGetVelocity(ent->body), MAX_SPEED / magnitude));
     }
 
-    cpVect position = cpBodyGetPosition(c->base.body);
-	game.camera.target = (Vector2){ position.x,position.y };
+
 }
 
 void DrawController(Controller* c)
@@ -203,7 +227,12 @@ void DrawController(Controller* c)
 
 	}
 
+
 	if(draw){DrawEntity((Entity*)c);}
+	for (int i = 0; i < c->nOrbs; ++i)
+	{
+		DrawEntity((Entity*)c->orbsAroundTheShip[i]);
+	}
 }
 
 void GainExperience(Controller* c,int xp)
@@ -216,4 +245,12 @@ void GainExperience(Controller* c,int xp)
         c->nextLevelXp *= 1.5;
         onPlayerLevelUP();
     }
+}
+
+void AddOrb(Controller* c)
+{
+	if(c->nOrbs == MAX_ORBITS){return;}
+	
+	c->orbsAroundTheShip[c->nOrbs++] = CreateBullet(&game.textures[IMG_BULLET_ORB_YELLOW],
+	(cpVect){0},(cpVect){0},rand() % 360,c->bulletSizeModifier * 3); 
 }

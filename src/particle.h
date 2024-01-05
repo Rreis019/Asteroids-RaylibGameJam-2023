@@ -47,5 +47,6 @@ Emitter* AddEmitter(Vector2 position,Vector2 velocity, Vector2 randVelRangeX, Ve
 
 Particle* AddParticleText(char* text,Vector2 position,Vector2 velocity,int sizeBegin,int sizeEnd,float lifespan,Color color);
 void DrawParticles(void);
+void RemoveAllParticles(void);
 
 

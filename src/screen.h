@@ -1,12 +1,13 @@
 #pragma once
 typedef enum { 
-    SCREEN_LOGO = 0, 
     SCREEN_TITLE, 
     SCREEN_GAMEPLAY,
     SCREEN_OPTIONS,
-    SCREEN_SHOP, 
-    SCREEN_ENDING
 }ScreenIndex;
+
+#define MENU_BUTTON_WIDTH 220
+#define MENU_BUTTON_HEIGHT 60
+#define MENU_SLIDER_HEIGHT 30
 
 void DrawCurrentScreen();
 void DrawCurrentScreenGui();
