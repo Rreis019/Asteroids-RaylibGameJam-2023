@@ -1,6 +1,6 @@
-## $(Game Title)
+## Astro Raider
 
-![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
+![Astro Raider](screenshots/screenshot000.png "$(Game Title)")
 
 ### Description
 
