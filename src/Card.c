@@ -10,7 +10,7 @@ void EmptyEffect(){}
 void BiggerBullet(){game.player->bulletSizeModifier += 0.5;}
 void BulletHell(){game.player->bulletsPerShoot++;}
 void FireRateBoost(){game.player->fireRateModifier += 0.50;}
-void InvincibleTime(){game.player->fireRateModifier += 2.0;}
+void InvincibleTime(){game.player->invincibleTimeModifier += 2.0;}
 void PiercingBullet(){game.player->piercingBulletsCount++;}
 void IncSpeed(){ game.player->speedModifier += 0.25;}
 void IncXpBoost() {game.player->xpBoostModifier += 1.00;}

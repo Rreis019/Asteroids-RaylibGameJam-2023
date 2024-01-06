@@ -26,7 +26,7 @@
 # Define required environment variables
 #------------------------------------------------------------------------------------------------
 # Define target platform: PLATFORM_DESKTOP, PLATFORM_WEB, PLATFORM_DRM
-PLATFORM              ?= PLATFORM_WEB
+PLATFORM              ?= PLATFORM_DESKTOP
 
 # Define project variables
 PROJECT_NAME          ?= AstroRaider
@@ -37,7 +37,7 @@ RAYLIB_PATH           ?= C:\\raylib
 RAYLIB_INCLUDE_PATH   ?= $(RAYLIB_PATH)/src
 RAYLIB_LIB_PATH       ?= $(RAYLIB_PATH)/src
 
-CHIPMUNK_PATH = C:\\chipmunkweb
+CHIPMUNK_PATH = C:\\chipmunk
 CHIPMUNK_INCLUDE_PATH = $(CHIPMUNK_PATH)/include
 CHIPMUNK_LIB_PATH = $(CHIPMUNK_PATH)/lib
 

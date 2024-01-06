@@ -113,13 +113,14 @@ void UpdateDrawFrame(void)
        DrawCurrentScreenGui();
     
 
-/*
-    if(GetCurrentScreen() == SCREEN_GAMEPLAY)
-    {
+       if(IsKeyPressed(KEY_ESCAPE)){
+            ToggleFullscreen();
+       }
+
+
         HideCursor();
         DrawTexture(game.textures[IMG_CURSOR], GetMouseX() - (game.textures[IMG_CURSOR].width),GetMouseY() - (game.textures[IMG_CURSOR].height), WHITE);
-    }
-  */  
+  
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }

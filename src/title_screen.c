@@ -82,9 +82,6 @@ Rectangle DrawTitle()
 		titleMoveUp = !titleMoveUp;
 	}
 
-	HideCursor();
-
-
 
 	Vector2 titleSize = MeasureTextEx(game.fonts[FONT_FASTUP],"AstroRaider",64,0);
 	DrawTextEx(game.fonts[FONT_FASTUP],"AstroRaider",
@@ -109,7 +106,6 @@ void DrawTitleScreenGui()
 	if(GuiButton(rect, "Play")){
 		ChangeScreen(SCREEN_GAMEPLAY);
 		PlaySound(game.sfx[AUDIO_CLICK]);
-		HideCursor();
 	}
 	rect.y += MENU_BUTTON_HEIGHT + MARGIN;
 
