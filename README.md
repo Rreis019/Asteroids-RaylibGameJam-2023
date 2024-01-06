@@ -1,70 +1,38 @@
------------------------------------
-
-_DISCLAIMER:_
-
-Welcome to the **raylib gamejam template**!
-
-This template provides a base structure to start developing a small raylib game in plain C for any of the proposed **raylib gamejams**!
-
-Please, considering the following usual gamejam restrictions: 
-
- - Game must be made with raylib
- - Game must be compiled for web
- - _Specific gamejam restrictions if defined_
- 
-NOTE: Several GitHub Actions workflows have been preconfigured to automatically build your game for Windows, Linux and WebAssembly on each commit. Those workflows automatically sync with latest version of raylib available to build.
-
-The repo is also pre-configured with a default `LICENSE` (zlib/libpng) and a `README.md` (this one) to be properly filled by users. Feel free to change the LICENSE as required.
-
-All the sections defined by `$(Data to Fill)` are expected to be edited and filled properly. It's recommended to delete this disclaimer message after editing this `README.md` file.
-
-This template has been created to be used with raylib (www.raylib.com) and it's licensed under an unmodified zlib/libpng license.
-
-_Copyright (c) 2022-2023 Ramon Santamaria ([@raysan5](https://twitter.com/raysan5))_
-
------------------------------------
-
 ## $(Game Title)
 
 ![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
 
 ### Description
 
-$(Your Game Description)
+AstroRaider is a space-themed ship game where players can shoot and progress through waves every n seconds.
+
+It features a leveling system where upon gaining a level, two random cards appear, allowing the player to choose their preferred upgrade.
 
 ### Features
 
- - $(Game Feature 01)
- - $(Game Feature 02)
- - $(Game Feature 03)
+ - LevelUp System
+ - Waves of enemies
+ - Diferentes types of enemies
 
 ### Controls
 
 Keyboard:
- - $(Game Control 01)
- - $(Game Control 02)
- - $(Game Control 03)
+ - W to move forward
+ - Space to Shoot
+ - Mouse Position to change direction of spaceship
 
 ### Screenshots
 
-_TODO: Show your game to the world, animated GIFs recommended!._
+screenshots/screenshot001.png)
+screenshots/screenshot002.png)
+screenshots/screenshot003.png)
 
 ### Developers
 
- - $(Developer 01) - $(Role/Tasks Developed)
- - $(Developer 02) - $(Role/Tasks Developed)
- - $(Developer 03) - $(Role/Tasks Developed)
-
-### Links
-
- - YouTube Gameplay: $(YouTube Link)
- - itch.io Release: $(itch.io Game Page)
- - Steam Release: $(Steam Game Page)
+ - $(Me) - $(Programmer)
 
 ### License
 
 This game sources are licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
-$(Additional Licenses)
 
-*Copyright (c) $(Year) $(User Name) ($(User Twitter/GitHub Name))*
