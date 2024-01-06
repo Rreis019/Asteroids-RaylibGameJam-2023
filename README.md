@@ -23,9 +23,9 @@ Keyboard:
 
 ### Screenshots
 
-screenshots/screenshot001.png)
-screenshots/screenshot002.png)
-screenshots/screenshot003.png)
+![Astro Raider](screenshots/screenshot001.png)
+![Astro Raider](screenshots/screenshot002.png)
+![Astro Raider](screenshots/screenshot003.png)
 
 ### Developers
 
