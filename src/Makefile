@@ -42,7 +42,7 @@ CHIPMUNK_INCLUDE_PATH = $(CHIPMUNK_PATH)/include
 CHIPMUNK_LIB_PATH = $(CHIPMUNK_PATH)/lib
 
 # Build mode for project: DEBUG or RELEASE
-BUILD_MODE            ?= RELEASE
+BUILD_MODE            ?= DEBUG
 
 # PLATFORM_WEB: Default properties
 BUILD_WEB_ASYNCIFY    ?= FALSE

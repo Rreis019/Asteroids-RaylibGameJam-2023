@@ -123,7 +123,8 @@ cpBool BulletVsBullet(cpArbiter *arb, cpSpace *space, cpDataPointer userData)
 
 void InitGame()
 {
-	game.audio = 0.05;
+	game.sfxVolume = 0.05;
+	game.musicVolume = 0.02;
 	LoadResources();
  	game.space = cpSpaceNew();
  	game.player =  CreateController(cpv(300,300));
@@ -163,7 +164,11 @@ void DestroyGame()
 {
 	for (int i = 0; i < game.nAsteroids; ++i){DestroyEntity(game.asteroids[i]);}
 	for (int i = 0; i < game.nBullets; ++i){  DestroyEntity(game.bullets[i]);}
+	for (int i = 0; i < game.nEnemys; ++i){  DestroyEntity((Entity*)game.enemys[i]);}
 	for (int i = 0; i < MAX_TEXTURES; ++i){UnloadTexture(game.textures[i]);}
+	for (int i = 0; i < MAX_FONTS; ++i){ UnloadFont(game.fonts[i]);}
+	for (int i = 0; i < MAX_MUSIC; ++i){ UnloadMusicStream(game.musics[i]);}
+	for (int i = 0; i < MAX_SFX; ++i){ UnloadSound(game.sfx[i]);}
 	cpSpaceFree(game.space);
 }
 
@@ -261,13 +266,15 @@ void LoadResources()
 	game.sfx[AUDIO_THRUST] = LoadSound(AUDIO_PATH "thrusterFire_003.wav");
 	game.sfx[AUDIO_CLICK] = LoadSound(AUDIO_PATH "click_001.ogg");
 	game.sfx[AUDIO_DROP] = LoadSound(AUDIO_PATH "drop_002.ogg");
+	game.musics[MUSIC_TELEPATH] = LoadMusicStream(AUDIO_PATH "telepath_hoa.mp3");
+	game.musics[MUSIC_TELEPATH].looping = true;
 
 
-	for (int i = 0; i < MAX_SFX; ++i)
-	{
-		SetSoundVolume(game.sfx[i], game.audio);
-	}
 
+
+	for (int i = 0; i < MAX_SFX; ++i){SetSoundVolume(game.sfx[i], game.sfxVolume);}
+	for (int i = 0; i < MAX_MUSIC; ++i){SetMusicVolume(game.musics[i], game.musicVolume);}
+    PlayMusicStream(game.musics[MUSIC_TELEPATH]);
 }
 
 void DrawBackground()

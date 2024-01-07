@@ -85,6 +85,13 @@ typedef enum
 	MAX_SFX
 }SFX_ID;
 
+typedef enum 
+{
+	MUSIC_TELEPATH,
+	MAX_MUSIC
+}MUSIC_ID;
+
+
 typedef struct
 {
 	Camera2D camera;
@@ -102,6 +109,7 @@ typedef struct
 	Texture2D textures[MAX_TEXTURES];
 	Sound  sfx[MAX_SFX];
 	Font   fonts[MAX_FONTS];
+	Music  musics[MAX_MUSIC];
 
 	WaveSpawner spawner;
 
@@ -109,7 +117,7 @@ typedef struct
 	bool pause;
 	bool gameOver;
 	bool showCardMenu;
-	float audio;
+	float sfxVolume,musicVolume;
 }Game;
 
 extern Game game;

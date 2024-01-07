@@ -76,8 +76,10 @@ int main(void)
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
 #else
-    SetTargetFPS(60);     
+    SetTargetFPS(60);  
+
     while (!WindowShouldClose()) {
+          UpdateMusicStream(game.musics[MUSIC_TELEPATH]);
         UpdateDrawFrame();
     }
 #endif
@@ -112,15 +114,10 @@ void UpdateDrawFrame(void)
                            (float)SCREEN_WIDTH*scale, (float)SCREEN_HEIGHT*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
        DrawCurrentScreenGui();
     
-
-       if(IsKeyPressed(KEY_ESCAPE)){
-            ToggleFullscreen();
-       }
-
-
+       #if defined(PLATFORM_DESKTOP)
         HideCursor();
         DrawTexture(game.textures[IMG_CURSOR], GetMouseX() - (game.textures[IMG_CURSOR].width),GetMouseY() - (game.textures[IMG_CURSOR].height), WHITE);
-  
+       #endif
     EndDrawing();
     //----------------------------------------------------------------------------------  
 }
