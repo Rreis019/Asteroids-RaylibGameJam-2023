@@ -43,7 +43,7 @@ void GenerateWave(WaveSpawner* wave)
 	while (waveValue > 0) {
 		int type = rand() % MAX_ENEMY_TYPES;
 		int cost = GetEnemyCost(type);
-		if(cost > waveValue || cost > startWaveValue * 0.3){continue;}
+		if(cost > waveValue || cost > startWaveValue * 0.5){continue;}
 		AddEnemyToSpawn(wave,type);
 		waveValue -= cost;
 	}	
