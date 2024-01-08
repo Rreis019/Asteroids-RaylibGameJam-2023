@@ -1,4 +1,7 @@
 ## Astro Raider
+GameJam : https://itch.io/jam/raylib-slo-jam <br>
+Itch.io : https://rreis019.itch.io/astro-raiders 
+
 
 ![Astro Raider](screenshots/screenshot000.png "$(Game Title)")
 
